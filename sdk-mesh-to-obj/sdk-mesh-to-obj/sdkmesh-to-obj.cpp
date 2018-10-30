@@ -9,7 +9,6 @@
 #include "sdkmesh.h"
 
 #include <iostream>
-#include <fstream>
 
 class InputParser {
 public:
@@ -62,7 +61,7 @@ int main(int argc, char** argv)
 	std::string inputFile;
 	std::string outputFile;
 
-	//Sdkmesh sdkmesh1();
+	Sdkmesh sdkmesh1 = Sdkmesh();
 
 	// parse input
 	if (parser.CmdOptionExists("-i"))
@@ -72,14 +71,23 @@ int main(int argc, char** argv)
 		std::cout << "Empty input file name!" << std::endl;
 		return -1;
 	}
-	if (parser.CmdOptionExists("-o"))
+	/*if (parser.CmdOptionExists("-o"))
 		inputFile = parser.GetCmdOption("-o");
 	else
 	{
 		std::cout << "Empty output file name!" << std::endl;
 		return -1;
 	}
+*/
+	std::cout << inputFile << std::endl;
+	std::ifstream input(inputFile, std::ios::binary | std::ios::in);
+	if (!input.good())
+	{
+		std::cout << "Input file does not exist" << std::endl;
+		return -1;
+	}
 
+	sdkmesh1.LoadSdkmeshHeader(input, 300);
 	/*if (Convert(inputFile, outputFile))
 		return -1;*/
 	

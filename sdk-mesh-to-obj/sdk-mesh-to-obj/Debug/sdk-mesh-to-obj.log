@@ -1,5 +1,6 @@
 ﻿  sdkmesh.cpp
-c:\users\fightingforpubg\desktop\sdkmesh-to-obj\sdk-mesh-to-obj\sdk-mesh-to-obj\sdkmesh.cpp(5): error C2338: Decl structure size incorrect
-c:\users\fightingforpubg\desktop\sdkmesh-to-obj\sdk-mesh-to-obj\sdk-mesh-to-obj\sdkmesh.cpp(7): error C2338: SDK Mesh structure size incorrect
-  sdkmesh-to-obj.cpp
   Generating Code...
+  Skipping... (no relevant changes detected)
+  sdkmesh-to-obj.cpp
+  sdk-mesh-to-obj.vcxproj -> C:\Users\fightingforPUBG\Desktop\sdkmesh-to-obj\sdk-mesh-to-obj\Debug\sdk-mesh-to-obj.exe
+  sdk-mesh-to-obj.vcxproj -> C:\Users\fightingforPUBG\Desktop\sdkmesh-to-obj\sdk-mesh-to-obj\Debug\sdk-mesh-to-obj.pdb (Full PDB)
