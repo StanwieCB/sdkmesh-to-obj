@@ -7,13 +7,13 @@ void Sdkmesh::DoCheck()
 	// cpp lacks binary standard in class and struct padding
 	// so we have to make sure that the size of our headers are exacting the same as the input binary file's
 	static_assert(sizeof(VertexElement) == 8, "Decl structure size incorrect");
-	static_assert(sizeof(SdkmeshHeader) == 104, "SDK Mesh structure size incorrect");
-	static_assert(sizeof(SdkmeshVertexBufferHeader) == 288, "SDK Mesh structure size incorrect");
-	static_assert(sizeof(SdkmeshIndexBufferHeader) == 32, "SDK Mesh structure size incorrect");
-	static_assert(sizeof(SdkmeshMesh) == 224, "SDK Mesh structure size incorrect");
-	static_assert(sizeof(SdkmeshSubset) == 144, "SDK Mesh structure size incorrect");
-	static_assert(sizeof(SdkmeshFrame) == 184, "SDK Mesh structure size incorrect");
-	static_assert(sizeof(SdkmeshMaterial) == 1256, "SDK Mesh structure size incorrect");
+	static_assert(sizeof(SdkmeshHeader) == 104, "SdkmeshHeader structure size incorrect");
+	static_assert(sizeof(SdkmeshVertexBufferHeader) == 288, "SdkmeshVertexBufferHeader structure size incorrect");
+	static_assert(sizeof(SdkmeshIndexBufferHeader) == 32, "SdkmeshIndexBufferHeader structure size incorrect");
+	static_assert(sizeof(SdkmeshMesh) == 224, "SdkmeshMesh structure size incorrect");
+	static_assert(sizeof(SdkmeshSubset) == 144, "SdkmeshSubset structure size incorrect");
+	static_assert(sizeof(SdkmeshFrame) == 184, "SdkmeshFrame structure size incorrect");
+	static_assert(sizeof(SdkmeshMaterial) == 1256, "SdkmeshMaterial structure size incorrect");
 
 	// not supported for animation
 	//static_assert(sizeof(DXUT::SDKANIMATION_FILE_HEADER) == 40, "SDK Mesh structure size incorrect");
@@ -26,8 +26,6 @@ void Sdkmesh::LoadSdkmeshHeader(std::ifstream& inputStream, std::streampos fileS
 	std::streampos pos = inputStream.tellg();
 	if (fileSize - pos < sizeof(Sdkmesh::SdkmeshHeader))
 		throw std::exception("EOF before reading Sdkmesh_header");
-
-	std::cout << pos << std::endl;
 
 	// deprecated
 	/*inputStream.read((char*)&sdkmesh_header.version, sizeof(sdkmesh_header.version));
@@ -45,6 +43,24 @@ void Sdkmesh::LoadSdkmeshHeader(std::ifstream& inputStream, std::streampos fileS
 
 	inputStream.read((char*)&sdkmesh_header, sizeof(SdkmeshHeader));
 
+	if (sdkmesh_header.version != SDKMESH_FILE_VERSION)
+		throw std::exception("Not a supported SDKMESH version");
+
+	if (sdkmesh_header.NumMeshes == 0)
+		throw std::exception("No meshes found");
+
+	if (sdkmesh_header.NumVertexBuffers == 0)
+		throw std::exception("No vertex buffers found");
+
+	if (sdkmesh_header.NumIndexBuffers == 0)
+		throw std::exception("No index buffers found");
+
+	if (sdkmesh_header.NumTotalSubsets == 0)
+		throw std::exception("No subsets found");
+
+	if (sdkmesh_header.NumMaterials == 0)
+		throw std::exception("No materials found");
+
 	// print to check
 	/*std::cout << "sdkmesh_header.version: " << sdkmesh_header.version << std::endl;
 	std::cout << "sdkmesh_header.IsBigEndian: " << sdkmesh_header.IsBigEndian << std::endl;
@@ -61,13 +77,11 @@ void Sdkmesh::LoadSdkmeshVertexBufferHeader(std::ifstream& inputStream, std::str
 	if (fileSize - pos < sizeof(SdkmeshVertexBufferHeader))
 		throw std::exception("EOF before reading Sdkmesh_vertex_buffer_header");
 
-	std::cout << pos << std::endl;
-
-	unsigned numbers = sdkmesh_header.NumVertexBuffers;
-	sdkmesh_vertex_header_buffers.resize(numbers);
-	for (unsigned i = 0; i < numbers; i++)
+	unsigned num = sdkmesh_header.NumVertexBuffers;
+	sdkmesh_vertex_buffer_headers.resize(num);
+	for (unsigned i = 0; i < num; i++)
 	{
-		inputStream.read((char*)&(sdkmesh_vertex_header_buffers[i]), sizeof(SdkmeshVertexBufferHeader));
+		inputStream.read((char*)&(sdkmesh_vertex_buffer_headers[i]), sizeof(SdkmeshVertexBufferHeader));
 	}
 
 	// print to check end decode
@@ -91,47 +105,143 @@ void Sdkmesh::LoadSdkmeshVertexBufferHeader(std::ifstream& inputStream, std::str
 	std::cout << "sdkmesh_vertex_header_buffers[1].Declaration[4] type:" << (int)sdkmesh_vertex_header_buffers[1].Decl[4].type << std::endl;*/
 
 	// vertex elemet structure (input Squidroom): 
-	//    usage        type      method
-	// 1. pos          Float3    default
-	// 2. normal       Dec3N     default
+	//    usage        type      method      size
+	// 1. pos          Float3    default     
+	// 2. normal       Dec3N     default     4
 	// 3. textureCord  HalfTwo   default
-	// 4. tangent      Dec3N     default
+	// 4. tangent      Dec3N     default     4
 
 }
 
 
 void Sdkmesh::LoadSdkemshIndexBufferHeader(std::ifstream& inputStream, std::streampos fileSize)
 {
+	std::streampos pos = inputStream.tellg();
+	if (fileSize - pos < sizeof(SdkmeshIndexBufferHeader))
+		throw std::exception("EOF before reading Sdkmesh_index_buffer_header");
 
+	unsigned num = sdkmesh_header.NumIndexBuffers;
+	sdkmesh_index_buffer_headers.resize(num);
+	for (unsigned i = 0; i < num; i++)
+	{
+		inputStream.read((char*)&(sdkmesh_index_buffer_headers[i]), sizeof(SdkmeshIndexBufferHeader));
+	}
+
+	// print to check
+	/*std::cout <<"sdkmesh_index_header_buffers[0].NumIndices:"<< sdkmesh_index_header_buffers[0].NumIndices << std::endl;
+	std::cout <<"sdkmesh_index_header_buffers[0].SizeBytes:"<< sdkmesh_index_header_buffers[0].SizeBytes << std::endl;
+	std::cout <<"sdkmesh_index_header_buffers[0].IndexType:"<< sdkmesh_index_header_buffers[0].IndexType << std::endl;
+	std::cout <<"sdkmesh_index_header_buffers[0].DataOffset:"<< sdkmesh_index_header_buffers[0].DataOffset << std::endl;*/
 }
 
 
 void Sdkmesh::LoadSdkmeshMesh(std::ifstream& inputStream, std::streampos fileSize)
 {
+	std::streampos pos = inputStream.tellg();
+	if (fileSize - pos < sizeof(SdkmeshMesh))
+		throw std::exception("EOF before reading Sdkmesh_meshes");
 
+	unsigned num = sdkmesh_header.NumMeshes;
+	sdkmesh_meshes.resize(num);
+	
+	for (unsigned i = 0; i < num; i++)
+	{
+		inputStream.read((char*)&(sdkmesh_meshes[i]), sizeof(SdkmeshMesh));
+	}
 }
 
 
 void Sdkmesh::LoadSdkmeshSubset(std::ifstream& inputStream, std::streampos fileSize)
 {
+	std::streampos pos = inputStream.tellg();
+	if (fileSize - pos < sizeof(SdkmeshSubset))
+		throw std::exception("EOF before reading Sdkmesh_SdkmeshSubset");
 
+	unsigned num = sdkmesh_header.NumTotalSubsets;
+	sdkmesh_subsets.resize(num);
+
+	for (unsigned i = 0; i < num; i++)
+	{
+		inputStream.read((char*)&(sdkmesh_subsets[i]), sizeof(SdkmeshSubset));
+	}
 }
 
 
 void Sdkmesh::LoadSdkmeshFrame(std::ifstream& inputStream, std::streampos fileSize)
 {
+	std::streampos pos = inputStream.tellg();
+	if (fileSize - pos < sizeof(SdkmeshFrame))
+		throw std::exception("EOF before reading Sdkmesh_SdkmeshFrame");
 
+	unsigned num = sdkmesh_header.NumFrames;
+	sdkmesh_frames.resize(num);
+
+	for (unsigned i = 0; i < num; i++)
+	{
+		inputStream.read((char*)&(sdkmesh_frames[i]), sizeof(SdkmeshFrame));
+	}
 }
 
 
 void Sdkmesh::LoadSdkmeshMaterial(std::ifstream& inputStream, std::streampos fileSize)
 {
+	std::streampos pos = inputStream.tellg();
+	if (fileSize - pos < sizeof(SdkmeshMaterial))
+		throw std::exception("EOF before reading Sdkmesh_SdkmeshMaterial");
 
+	unsigned num = sdkmesh_header.NumMaterials;
+	sdkmesh_materials.resize(num);
+
+	for (unsigned i = 0; i < num; i++)
+	{
+		inputStream.read((char*)&(sdkmesh_materials[i]), sizeof(SdkmeshMaterial));
+	}
 }
 
-void Sdkmesh::LoadSdkmeshVertexBuffer(std::ifstream& inputStreamm, std::streampos fileSize)
+void Sdkmesh::LoadSdkmeshVertexBuffer(std::ifstream& inputStream, std::streampos fileSize)
 {
+	// tricky
+	unsigned num_buffer = sdkmesh_header.NumVertexBuffers;
+	
+	for (unsigned i = 0; i < num_buffer; i++)
+	{
+		// seek corresponding offset
+		inputStream.seekg(sdkmesh_vertex_buffer_headers[i].DataOffset, std::ios::beg);
 
+		uint64_t num_vertices = sdkmesh_vertex_buffer_headers[i].NumVertices;
+
+		std::vector<PosNormalTexTan> vertexBuffer;
+		for (uint64_t j = 0; j < num_vertices; j++)
+		{
+			PosNormalTexTan vertex;
+			// usage switch
+			unsigned usage_ind = 0;
+			while (sdkmesh_vertex_buffer_headers[i].Decl[usage_ind].type != DeclarationType::Unused)
+			{
+				switch (sdkmesh_vertex_buffer_headers[i].Decl[usage_ind].usage)
+				{
+				case DeclarationUsage::Position:
+					inputStream.read((char*)&vertex.pos, sizeof(Vec3));
+					break;
+				case DeclarationUsage::Normal:
+					inputStream.read((char*)&vertex.norm, sizeof(Vec3));
+					break;
+				case DeclarationUsage::TextureCoordinate:
+					inputStream.read((char*)&vertex.tex, sizeof(Vec2));
+					break;
+				case DeclarationUsage::Tangent:
+					inputStream.read((char*)&vertex.tan, sizeof(Vec3));
+					break;
+				default:
+					// other cases to be explored
+					break;
+				}
+				usage_ind++;
+			}
+			vertexBuffer.push_back(vertex);
+		}
+		vertex_buffers.push_back(vertexBuffer);
+	}
 }
 
 void Sdkmesh::LoadSdkmeshIndexBuffer(std::ifstream& inputStream, std::streampos fileSize)

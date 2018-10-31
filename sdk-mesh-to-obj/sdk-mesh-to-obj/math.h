@@ -81,11 +81,12 @@ enum class DeclarationUsage : byte
 	Sample = 13
 };
 
+// https://docs.microsoft.com/en-us/windows/desktop/direct3d9/d3dvertexelement9
 struct VertexElement
 {
 public:
-	uint16_t offset;
 	uint16_t stream;
+	uint16_t offset;
 	DeclarationType type;
 	DeclarationMethod method;
 	DeclarationUsage usage;
@@ -99,6 +100,7 @@ class Vec2
 {
 public:
 	float X, Y;
+	Vec2() : X(0), Y(0) {}
 	Vec2(float value) : X(value), Y(value){}
 	Vec2(float x, float y) : X(x), Y(y) {}
 };
@@ -107,6 +109,7 @@ class Vec3
 {
 public:
 	float X, Y, Z;
+	Vec3() : X(0), Y(0), Z(0) {}
 	Vec3(float value) : X(value), Y(value), Z(value) {}
 	Vec3(Vec2 value, float z) : X(value.X), Y(value.Y), Z(z) {}
 	Vec3(float x, float y, float z) : X(x), Y(y), Z(z) {}
@@ -142,6 +145,7 @@ public:
 	Vec2 tex;
 	Vec3 tan;
 
+	PosNormalTexTan() {};
 	PosNormalTexTan(Vec3 position, Vec3 normal, Vec2 texture, Vec3 tangent)
 		: pos(position), norm(normal), tex(texture), tan(tangent) {}
 };

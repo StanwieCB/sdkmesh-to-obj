@@ -1,6 +1,6 @@
 ﻿  sdkmesh.cpp
-  Generating Code...
-  Skipping... (no relevant changes detected)
+c:\users\fightingforpubg\desktop\sdkmesh-to-obj\sdk-mesh-to-obj\sdk-mesh-to-obj\sdkmesh.cpp(211): warning C4244: 'initializing': conversion from 'uint64_t' to 'unsigned int', possible loss of data
   sdkmesh-to-obj.cpp
+  Generating Code...
   sdk-mesh-to-obj.vcxproj -> C:\Users\fightingforPUBG\Desktop\sdkmesh-to-obj\sdk-mesh-to-obj\Debug\sdk-mesh-to-obj.exe
   sdk-mesh-to-obj.vcxproj -> C:\Users\fightingforPUBG\Desktop\sdkmesh-to-obj\sdk-mesh-to-obj\Debug\sdk-mesh-to-obj.pdb (Full PDB)

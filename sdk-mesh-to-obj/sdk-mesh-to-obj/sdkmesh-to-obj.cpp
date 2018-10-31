@@ -62,6 +62,7 @@ int main(int argc, char** argv)
 	std::string outputFile;
 
 	Sdkmesh sdkmesh1 = Sdkmesh();
+	sdkmesh1.DoCheck();
 
 	// parse input
 	if (parser.CmdOptionExists("-i"))
@@ -87,8 +88,21 @@ int main(int argc, char** argv)
 		return -1;
 	}
 
-	sdkmesh1.LoadSdkmeshHeader(input, 300);
-	sdkmesh1.LoadSdkmeshVertexBufferHeader(input, 30000);
+	std::streampos fileSize = input.tellg();
+	input.seekg(0, std::ios::end);
+	fileSize = input.tellg() - fileSize;
+	input.seekg(0, std::ios::beg);
+
+	/*sdkmesh1.LoadSdkmeshHeader(input, fileSize);
+	sdkmesh1.LoadSdkmeshVertexBufferHeader(input, fileSize);
+	sdkmesh1.LoadSdkemshIndexBufferHeader(input, fileSize);
+	sdkmesh1.LoadSdkmeshMesh(input, fileSize);
+	sdkmesh1.LoadSdkmeshSubset(input, fileSize);
+	sdkmesh1.LoadSdkmeshFrame(input, fileSize);
+	sdkmesh1.LoadSdkmeshMaterial(input, fileSize);
+*/
+
+	//std::cout << sizeof(Mat4) << std::endl;
 
 	/*if (Convert(inputFile, outputFile))
 		return -1;*/

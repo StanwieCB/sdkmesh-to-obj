@@ -52,9 +52,9 @@ private:
 
 	struct SdkmeshIndexBufferHeader
 	{
-		uint64_t NumVertices;
+		uint64_t NumIndices;
 		uint64_t SizeBytes;
-		uint64_t StrideBytes;
+		uint32_t IndexType;
 		uint64_t DataOffset;
 	};
 
@@ -71,13 +71,11 @@ private:
 
 		union
 		{
-			uint64_t SubsetOffset;
-			uint32_t* pSubsets;
+			uint64_t SubsetOffset;		
 		};
 		union
 		{
-			uint64_t FrameInfluenceOffset;
-			uint32_t* pFrameInfluences;
+			uint64_t FrameInfluenceOffset;		
 		};
 	};
 
@@ -147,15 +145,15 @@ private:
 	};
 
 	SdkmeshHeader sdkmesh_header;
-	std::vector<SdkmeshVertexBufferHeader> sdkmesh_vertex_header_buffers;
-	std::vector<SdkmeshIndexBufferHeader> sdkmesh_index_header_buffers;
+	std::vector<SdkmeshVertexBufferHeader> sdkmesh_vertex_buffer_headers;
+	std::vector<SdkmeshIndexBufferHeader> sdkmesh_index_buffer_headers;
 	std::vector<SdkmeshMesh> sdkmesh_meshes;
 	std::vector<SdkmeshSubset> sdkmesh_subsets;
 	std::vector<SdkmeshFrame> sdkmesh_frames;
 	std::vector<SdkmeshMaterial> sdkmesh_materials;
 
-	std::vector<uint16_t> vertex_buffer;
-	std::vector<int> index_buffer;
+	std::vector<std::vector<PosNormalTexTan>> vertex_buffers;
+	std::vector<std::vector<int>> index_buffers;
 
 public:
 	Sdkmesh() { DoCheck(); }
