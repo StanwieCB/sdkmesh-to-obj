@@ -88,6 +88,8 @@ int main(int argc, char** argv)
 	}
 
 	sdkmesh1.LoadSdkmeshHeader(input, 300);
+	sdkmesh1.LoadSdkmeshVertexBufferHeader(input, 30000);
+
 	/*if (Convert(inputFile, outputFile))
 		return -1;*/
 	

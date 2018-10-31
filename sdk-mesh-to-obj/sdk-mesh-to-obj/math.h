@@ -84,12 +84,12 @@ enum class DeclarationUsage : byte
 struct VertexElement
 {
 public:
-	DeclarationMethod method;
-	DeclarationType type;
-	DeclarationUsage usage;
-	byte usage_index;
 	uint16_t offset;
 	uint16_t stream;
+	DeclarationType type;
+	DeclarationMethod method;
+	DeclarationUsage usage;
+	byte usage_index;
 
 	/*VertexElement(uint16_t stream, uint16_t offset, DeclarationType declarationType, DeclarationMethod declarationMethod, DeclarationUsage declarationUsage, byte usageIndex)
 		: stream(stream), offset(offset), type(declarationType), method(declarationMethod), usage(declarationUsage), usage_index(usageIndex) {}*/

@@ -1,4 +1,5 @@
 #include "sdkmesh.h"
+#include <cassert>
 #include <iostream>
 
 void Sdkmesh::DoCheck()
@@ -45,11 +46,12 @@ void Sdkmesh::LoadSdkmeshHeader(std::ifstream& inputStream, std::streampos fileS
 	inputStream.read((char*)&sdkmesh_header, sizeof(SdkmeshHeader));
 
 	// print to check
-	std::cout << "sdkmesh_header.version: " << sdkmesh_header.version << std::endl;
+	/*std::cout << "sdkmesh_header.version: " << sdkmesh_header.version << std::endl;
 	std::cout << "sdkmesh_header.IsBigEndian: " << sdkmesh_header.IsBigEndian << std::endl;
 	std::cout << "sdkmesh_header.HeaderSize: " << sdkmesh_header.HeaderSize << std::endl;
 	std::cout << "sdkmesh_header.NonBufferDataSize: " << sdkmesh_header.NonBufferDataSize << std::endl;
 	std::cout << "sdkmesh_header.BufferDataSize: " << sdkmesh_header.BufferDataSize << std::endl;
+	std::cout << "sdkmesh_header.NumMeshes: " << sdkmesh_header.NumMeshes << std::endl;*/
 
 }
 
@@ -61,14 +63,40 @@ void Sdkmesh::LoadSdkmeshVertexBufferHeader(std::ifstream& inputStream, std::str
 
 	std::cout << pos << std::endl;
 
-	inputStream.read((char*)&sdkmesh_vertex_header_buffers, sizeof(SdkmeshVertexBufferHeader));
+	unsigned numbers = sdkmesh_header.NumVertexBuffers;
+	sdkmesh_vertex_header_buffers.resize(numbers);
+	for (unsigned i = 0; i < numbers; i++)
+	{
+		inputStream.read((char*)&(sdkmesh_vertex_header_buffers[i]), sizeof(SdkmeshVertexBufferHeader));
+	}
 
-	// print to check
-	std::cout << "sdkmesh_header.version: " << sdkmesh_header.version << std::endl;
-	std::cout << "sdkmesh_header.IsBigEndian: " << sdkmesh_header.IsBigEndian << std::endl;
-	std::cout << "sdkmesh_header.HeaderSize: " << sdkmesh_header.HeaderSize << std::endl;
-	std::cout << "sdkmesh_header.NonBufferDataSize: " << sdkmesh_header.NonBufferDataSize << std::endl;
-	std::cout << "sdkmesh_header.BufferDataSize: " << sdkmesh_header.BufferDataSize << std::endl;
+	// print to check end decode
+	/*std::cout << "sdkmesh_vertex_header_buffers[0].NumVertices: " << sdkmesh_vertex_header_buffers[0].NumVertices << std::endl;
+	std::cout << "sdkmesh_vertex_header_buffers[0].SizeBytes: " << sdkmesh_vertex_header_buffers[0].SizeBytes << std::endl;
+	std::cout << "sdkmesh_vertex_header_buffers[0].StrideBytes: " << sdkmesh_vertex_header_buffers[0].StrideBytes << std::endl;
+	std::cout << "sdkmesh_vertex_header_buffers[1].Declaration[0] Method:" << (int)sdkmesh_vertex_header_buffers[1].Decl[0].method << std::endl;
+	std::cout << "sdkmesh_vertex_header_buffers[1].Declaration[0] usage:" << (int)sdkmesh_vertex_header_buffers[1].Decl[0].usage << std::endl;
+	std::cout << "sdkmesh_vertex_header_buffers[1].Declaration[0] type:" << (int)sdkmesh_vertex_header_buffers[1].Decl[0].type << std::endl;
+	std::cout << "sdkmesh_vertex_header_buffers[1].Declaration[1] Method:" << (int)sdkmesh_vertex_header_buffers[1].Decl[1].method << std::endl;
+	std::cout << "sdkmesh_vertex_header_buffers[1].Declaration[1] usage:" << (int)sdkmesh_vertex_header_buffers[1].Decl[1].usage << std::endl;
+	std::cout << "sdkmesh_vertex_header_buffers[1].Declaration[1] type:" << (int)sdkmesh_vertex_header_buffers[1].Decl[1].type << std::endl;
+	std::cout << "sdkmesh_vertex_header_buffers[1].Declaration[2] Method:" << (int)sdkmesh_vertex_header_buffers[1].Decl[2].method << std::endl;
+	std::cout << "sdkmesh_vertex_header_buffers[1].Declaration[2] usage:" << (int)sdkmesh_vertex_header_buffers[1].Decl[2].usage << std::endl;
+	std::cout << "sdkmesh_vertex_header_buffers[1].Declaration[2] type:" << (int)sdkmesh_vertex_header_buffers[1].Decl[2].type << std::endl;
+	std::cout << "sdkmesh_vertex_header_buffers[1].Declaration[3] Method:" << (int)sdkmesh_vertex_header_buffers[1].Decl[3].method << std::endl;
+	std::cout << "sdkmesh_vertex_header_buffers[1].Declaration[3] usage:" << (int)sdkmesh_vertex_header_buffers[1].Decl[3].usage << std::endl;
+	std::cout << "sdkmesh_vertex_header_buffers[1].Declaration[3] type:" << (int)sdkmesh_vertex_header_buffers[1].Decl[3].type << std::endl;
+	std::cout << "sdkmesh_vertex_header_buffers[1].Declaration[4] Method:" << (int)sdkmesh_vertex_header_buffers[1].Decl[4].method << std::endl;
+	std::cout << "sdkmesh_vertex_header_buffers[1].Declaration[4] usage:" << (int)sdkmesh_vertex_header_buffers[1].Decl[4].usage << std::endl;
+	std::cout << "sdkmesh_vertex_header_buffers[1].Declaration[4] type:" << (int)sdkmesh_vertex_header_buffers[1].Decl[4].type << std::endl;*/
+
+	// vertex elemet structure (input Squidroom): 
+	//    usage        type      method
+	// 1. pos          Float3    default
+	// 2. normal       Dec3N     default
+	// 3. textureCord  HalfTwo   default
+	// 4. tangent      Dec3N     default
+
 }
 
 
