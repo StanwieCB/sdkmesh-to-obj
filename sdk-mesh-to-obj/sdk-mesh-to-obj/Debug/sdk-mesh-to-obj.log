@@ -1,13 +1,3 @@
-﻿  sdkmesh.cpp
-c:\users\fightingforpubg\desktop\sdkmesh-to-obj\sdk-mesh-to-obj\sdk-mesh-to-obj\sdkmesh.cpp(219): warning C4018: '>': signed/unsigned mismatch
-c:\users\fightingforpubg\desktop\sdkmesh-to-obj\sdk-mesh-to-obj\sdk-mesh-to-obj\sdkmesh.cpp(226): warning C4244: 'argument': conversion from 'uint64_t' to 'unsigned int', possible loss of data
-c:\users\fightingforpubg\desktop\sdkmesh-to-obj\sdk-mesh-to-obj\sdk-mesh-to-obj\sdkmesh.cpp(254): warning C4244: 'argument': conversion from 'uint64_t' to 'unsigned int', possible loss of data
-c:\users\fightingforpubg\desktop\sdkmesh-to-obj\sdk-mesh-to-obj\sdk-mesh-to-obj\sdkmesh.cpp(297): warning C4018: '>': signed/unsigned mismatch
-c:\users\fightingforpubg\desktop\sdkmesh-to-obj\sdk-mesh-to-obj\sdk-mesh-to-obj\sdkmesh.cpp(304): warning C4018: '>': signed/unsigned mismatch
-c:\users\fightingforpubg\desktop\sdkmesh-to-obj\sdk-mesh-to-obj\sdk-mesh-to-obj\sdkmesh.cpp(313): warning C4244: 'argument': conversion from 'uint64_t' to 'unsigned int', possible loss of data
-c:\users\fightingforpubg\desktop\sdkmesh-to-obj\sdk-mesh-to-obj\sdk-mesh-to-obj\sdkmesh.cpp(327): warning C4244: 'argument': conversion from 'uint64_t' to 'unsigned int', possible loss of data
-  Generating Code...
-  Skipping... (no relevant changes detected)
-  sdkmesh-to-obj.cpp
+﻿  sdkmesh-to-obj.cpp
   sdk-mesh-to-obj.vcxproj -> C:\Users\fightingforPUBG\Desktop\sdkmesh-to-obj\sdk-mesh-to-obj\Debug\sdk-mesh-to-obj.exe
   sdk-mesh-to-obj.vcxproj -> C:\Users\fightingforPUBG\Desktop\sdkmesh-to-obj\sdk-mesh-to-obj\Debug\sdk-mesh-to-obj.pdb (Full PDB)

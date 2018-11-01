@@ -197,10 +197,11 @@ void Sdkmesh::LoadSdkmeshMaterial(std::ifstream& inputStream, std::streampos fil
 		inputStream.read((char*)&(sdkmesh_materials[i]), sizeof(SdkmeshMaterial));
 	}
 
-	std::cout << sdkmesh_materials[num - 1].Name << std::endl;
+	// print to check
+	/*std::cout << sdkmesh_materials[num - 1].Name << std::endl;
 	std::cout << sdkmesh_materials[num - 1].MaterialInstancePath << std::endl;
 	std::cout << sdkmesh_materials[num - 1].DiffuseTexture << std::endl;
-	std::cout << sdkmesh_materials[num - 1].Force64_6 << std::endl;
+	std::cout << sdkmesh_materials[num - 1].Force64_6 << std::endl;*/
 }
 
 void Sdkmesh::LoadSdkmeshVertexBuffer(std::ifstream& inputStream, std::streampos fileSize)
