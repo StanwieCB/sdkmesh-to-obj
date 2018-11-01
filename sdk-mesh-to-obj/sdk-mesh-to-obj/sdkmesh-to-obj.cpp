@@ -38,17 +38,28 @@ private:
 int Convert(const std::string& inputFile, const std::string& outputFile)
 {
 	std::ifstream input(inputFile, std::ios::binary | std::ios::in);
+	if (!input.good())
+	{
+		std::cout << "Input file does not exist" << std::endl;
+		return -1;
+	}
+	if (outputFile.substr(outputFile.size() - 4) != ".obj")
+	{
+		std::cout << "Please speficy an .obj output" << std::endl;
+		return -1;
+	}
+	std::ofstream output(outputFile, std::ios::out | std::ios::binary);
 
 	// traverse to count size
-	// a bit silly
+	// a bit silly but an accurate way
 	std::streampos fileSize = input.tellg();
 	input.seekg(0, std::ios::end);
 	fileSize = input.tellg() - fileSize;
 	input.seekg(0, std::ios::beg);
 
-	std::ofstream output(outputFile, std::ios::out | std::ios::binary);
-
 	Sdkmesh sdkmeshInstane(input, fileSize);
+
+	// start to dump into .obj output
 
 	input.close();
 	output.close();
@@ -80,8 +91,10 @@ int main(int argc, char** argv)
 		return -1;
 	}
 */
-	std::cout << inputFile << std::endl;
-	std::ifstream input(inputFile, std::ios::binary | std::ios::in);
+	std::cout << "Input target: " << inputFile << std::endl;
+	// std::cout << "Output target: " << inputFile << std::endl;
+	
+	/*std::ifstream input(inputFile, std::ios::binary | std::ios::in);
 	if (!input.good())
 	{
 		std::cout << "Input file does not exist" << std::endl;
@@ -93,19 +106,12 @@ int main(int argc, char** argv)
 	fileSize = input.tellg() - fileSize;
 	input.seekg(0, std::ios::beg);
 
-	/*sdkmesh1.LoadSdkmeshHeader(input, fileSize);
-	sdkmesh1.LoadSdkmeshVertexBufferHeader(input, fileSize);
-	sdkmesh1.LoadSdkemshIndexBufferHeader(input, fileSize);
-	sdkmesh1.LoadSdkmeshMesh(input, fileSize);
-	sdkmesh1.LoadSdkmeshSubset(input, fileSize);
-	sdkmesh1.LoadSdkmeshFrame(input, fileSize);
-	sdkmesh1.LoadSdkmeshMaterial(input, fileSize);
-*/
+	sdkmesh1.CreateFromFile(input, fileSize);
+	std::cout << input.tellg() << std::endl;
+	std::cout << fileSize << std::endl;*/
 
-	//std::cout << sizeof(Mat4) << std::endl;
-
-	/*if (Convert(inputFile, outputFile))
-		return -1;*/
+	if (Convert(inputFile, outputFile))
+		return -1;
 	
 	return 0;
 }

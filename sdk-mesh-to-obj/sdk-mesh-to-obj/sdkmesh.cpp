@@ -196,21 +196,34 @@ void Sdkmesh::LoadSdkmeshMaterial(std::ifstream& inputStream, std::streampos fil
 	{
 		inputStream.read((char*)&(sdkmesh_materials[i]), sizeof(SdkmeshMaterial));
 	}
+
+	std::cout << sdkmesh_materials[num - 1].Name << std::endl;
+	std::cout << sdkmesh_materials[num - 1].MaterialInstancePath << std::endl;
+	std::cout << sdkmesh_materials[num - 1].DiffuseTexture << std::endl;
+	std::cout << sdkmesh_materials[num - 1].Force64_6 << std::endl;
 }
 
 void Sdkmesh::LoadSdkmeshVertexBuffer(std::ifstream& inputStream, std::streampos fileSize)
 {
 	// tricky
-	unsigned num_buffer = sdkmesh_header.NumVertexBuffers;
-	
-	for (unsigned i = 0; i < num_buffer; i++)
+	uint32_t num_buffer = sdkmesh_header.NumVertexBuffers;
+
+	vertex_buffers.resize(num_buffer);
+	for (uint32_t i = 0; i < num_buffer; i++)
 	{
 		// seek corresponding offset
 		inputStream.seekg(sdkmesh_vertex_buffer_headers[i].DataOffset, std::ios::beg);
+		// don't knwo if we need padding StrideBytes, reserve for later
 
 		uint64_t num_vertices = sdkmesh_vertex_buffer_headers[i].NumVertices;
+		if ((uint64_t)inputStream.tellg() + num_vertices * sizeof(PosNormalTexTan) > fileSize)
+		{
+			std::cout << "EOF before reading vertex buffer " << i << std::endl;
+			throw std::exception("EOF before reading vertex buffer %d", i);
+		}
 
 		std::vector<PosNormalTexTan> vertexBuffer;
+		vertexBuffer.resize(num_vertices);
 		for (uint64_t j = 0; j < num_vertices; j++)
 		{
 			PosNormalTexTan vertex;
@@ -238,15 +251,83 @@ void Sdkmesh::LoadSdkmeshVertexBuffer(std::ifstream& inputStream, std::streampos
 				}
 				usage_ind++;
 			}
-			vertexBuffer.push_back(vertex);
+			vertexBuffer[j] = vertex;
 		}
-		vertex_buffers.push_back(vertexBuffer);
+		vertex_buffers[i] = vertexBuffer;
 	}
+
+	// print to check
+	/*std::cout << vertex_buffers[0][0].pos.X << std::endl;
+	std::cout << vertex_buffers[0][0].pos.Y << std::endl;
+	std::cout << vertex_buffers[0][0].pos.Z << std::endl;
+	std::cout << vertex_buffers[0][0].norm.X << std::endl;
+	std::cout << vertex_buffers[0][0].norm.Y << std::endl;
+	std::cout << vertex_buffers[0][0].norm.Z << std::endl;
+	std::cout << vertex_buffers[0][0].tan.X << std::endl;
+	std::cout << vertex_buffers[0][0].tan.Y << std::endl;
+	std::cout << vertex_buffers[0][0].tan.Z << std::endl;
+	std::cout << std::endl;
+	std::cout << vertex_buffers[num_buffer - 1][sdkmesh_vertex_buffer_headers[num_buffer - 1].NumVertices - 1].pos.X << std::endl;
+	std::cout << vertex_buffers[num_buffer - 1][sdkmesh_vertex_buffer_headers[num_buffer - 1].NumVertices - 1].pos.Y << std::endl;
+	std::cout << vertex_buffers[num_buffer - 1][sdkmesh_vertex_buffer_headers[num_buffer - 1].NumVertices - 1].pos.Z << std::endl;
+	std::cout << vertex_buffers[num_buffer - 1][sdkmesh_vertex_buffer_headers[num_buffer - 1].NumVertices - 1].norm.X << std::endl;
+	std::cout << vertex_buffers[num_buffer - 1][sdkmesh_vertex_buffer_headers[num_buffer - 1].NumVertices - 1].norm.Y << std::endl;
+	std::cout << vertex_buffers[num_buffer - 1][sdkmesh_vertex_buffer_headers[num_buffer - 1].NumVertices - 1].norm.Z << std::endl;
+	std::cout << vertex_buffers[num_buffer - 1][sdkmesh_vertex_buffer_headers[num_buffer - 1].NumVertices - 1].tan.X << std::endl;
+	std::cout << vertex_buffers[num_buffer - 1][sdkmesh_vertex_buffer_headers[num_buffer - 1].NumVertices - 1].tan.Y << std::endl;
+	std::cout << vertex_buffers[num_buffer - 1][sdkmesh_vertex_buffer_headers[num_buffer - 1].NumVertices - 1].tan.Z << std::endl;*/
 }
 
 void Sdkmesh::LoadSdkmeshIndexBuffer(std::ifstream& inputStream, std::streampos fileSize)
 {
+	// tricky
+	uint32_t num_buffer = sdkmesh_header.NumIndexBuffers;
 
+	index_buffers.resize(num_buffer);
+	for (uint32_t i = 0; i < num_buffer; i++)
+	{
+		// seek corresponding offset
+		inputStream.seekg(sdkmesh_index_buffer_headers[i].DataOffset, std::ios::beg);
+		// don't knwo if we need padding StrideBytes, reserve for later
+
+		uint64_t num_indices = sdkmesh_index_buffer_headers[i].NumIndices;
+		switch (sdkmesh_index_buffer_headers[i].IndexType)
+		{
+		case 0:
+			if ((uint64_t)inputStream.tellg() + num_indices * sizeof(uint16_t) > fileSize)
+			{
+				std::cout << "EOF before reading index buffer " << i << std::endl;
+				throw std::exception("EOF before reading index buffer %d", i);
+			}
+			break;
+		default:
+			if ((uint64_t)inputStream.tellg() + num_indices * sizeof(uint32_t) > fileSize)
+			{
+				std::cout << "EOF before reading index buffer " << i << std::endl;
+				throw std::exception("EOF before reading index buffer %d", i);
+			}
+			break;
+		}
+
+		std::vector<int> indexBuffer;
+		indexBuffer.resize(num_indices);
+		for (uint64_t j = 0; j < num_indices; j++)
+		{
+			int index;
+			// usage switch
+			switch (sdkmesh_index_buffer_headers[i].IndexType)
+			{
+			case 0:
+				inputStream.read((char*)&index, sizeof(uint16_t));
+				break;
+			default:
+				inputStream.read((char*)&index, sizeof(uint32_t));
+				break;
+			}
+			indexBuffer[j] = index;
+		}
+		index_buffers[i] = indexBuffer;
+	}
 }
 
 Sdkmesh::Sdkmesh(std::ifstream& inputStream, std::streampos fileSize)
@@ -260,10 +341,19 @@ Sdkmesh::Sdkmesh(std::ifstream& inputStream, std::streampos fileSize)
 	LoadSdkmeshMaterial(inputStream, fileSize);
 
 	LoadSdkmeshVertexBuffer(inputStream, fileSize);
-	LoadSdkmeshIndexBuffer(inputStream, fileSize);
+	//LoadSdkmeshIndexBuffer(inputStream, fileSize);
 }
 
 void Sdkmesh::CreateFromFile(std::ifstream& inputStream, std::streampos fileSize)
 {
+	LoadSdkmeshHeader(inputStream, fileSize);
+	LoadSdkmeshVertexBufferHeader(inputStream, fileSize);
+	LoadSdkemshIndexBufferHeader(inputStream, fileSize);
+	LoadSdkmeshMesh(inputStream, fileSize);
+	LoadSdkmeshSubset(inputStream, fileSize);
+	LoadSdkmeshFrame(inputStream, fileSize);
+	LoadSdkmeshMaterial(inputStream, fileSize);
 
+	LoadSdkmeshVertexBuffer(inputStream, fileSize);
+	LoadSdkmeshIndexBuffer(inputStream, fileSize);
 }

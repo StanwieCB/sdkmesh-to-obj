@@ -55,7 +55,11 @@ private:
 		uint64_t NumIndices;
 		uint64_t SizeBytes;
 		uint32_t IndexType;
-		uint64_t DataOffset;
+
+		union 
+		{
+			uint64_t DataOffset;
+		};
 	};
 
 	struct SdkmeshMesh
