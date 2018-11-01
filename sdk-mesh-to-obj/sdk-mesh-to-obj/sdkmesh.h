@@ -179,6 +179,16 @@ public:
 	
 	void LoadSdkmeshVertexBuffer(std::ifstream& inputStream, std::streampos fileSize);
 	void LoadSdkmeshIndexBuffer(std::ifstream& inputStream, std::streampos fileSize);
+
+	const SdkmeshHeader& GetSdkmeshHeader() { return sdkmesh_header; }
+	const std::vector<SdkmeshVertexBufferHeader>& GetSdkmeshVertexBufferHeader() { return sdkmesh_vertex_buffer_headers; }
+	const std::vector<SdkmeshIndexBufferHeader>& GetSdkemshIndexBufferHeader() { return sdkmesh_index_buffer_headers; }
+	const std::vector<SdkmeshMesh>& GetSdkmeshMesh() { return sdkmesh_meshes; }
+	const std::vector<SdkmeshSubset>& GetSdkmeshSubset() { return sdkmesh_subsets; }
+	const std::vector<SdkmeshFrame>& GetSdkmeshFrame() { return sdkmesh_frames; }
+	const std::vector<SdkmeshMaterial>& GetSdkmeshMaterial() { return sdkmesh_materials; }
+	const std::vector<std::vector<PosNormalTexTan>>& GetSdkmeshVertexBuffer() { return vertex_buffers; }
+	const std::vector<std::vector<int>>& GetSdkmeshIndexBuffer() { return index_buffers; }
 };
 
 #endif 

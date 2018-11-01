@@ -35,12 +35,20 @@ private:
 	std::vector <std::string> args;
 };
 
+int WriteOBJ(const Sdkmesh& sdkmesh, std::ofstream& output)
+{
+	// vetices
+	output << "# List of geometric vertices, with (x, y, z [,w]) coordinates, w is optional and defaults to 1.0\n";
+
+}
+
 int Convert(const std::string& inputFile, const std::string& outputFile)
 {
 	std::ifstream input(inputFile, std::ios::binary | std::ios::in);
 	if (!input.good())
 	{
 		std::cout << "Input file does not exist" << std::endl;
+		input.close();
 		return -1;
 	}
 	if (outputFile.substr(outputFile.size() - 4) != ".obj")
@@ -60,6 +68,12 @@ int Convert(const std::string& inputFile, const std::string& outputFile)
 	Sdkmesh sdkmeshInstane(input, fileSize);
 
 	// start to dump into .obj output
+	if (WriteOBJ(sdkmeshInstane, output) == -1)
+	{
+		std::cout << "Dump into .obj failed" << std::endl;
+		input.close();
+		output.close();
+	}
 
 	input.close();
 	output.close();
@@ -75,7 +89,7 @@ int main(int argc, char** argv)
 	Sdkmesh sdkmesh1 = Sdkmesh();
 	sdkmesh1.DoCheck();
 
-	// parse input
+	// parse arguments
 	if (parser.CmdOptionExists("-i"))
 		inputFile = parser.GetCmdOption("-i");
 	else
@@ -94,6 +108,7 @@ int main(int argc, char** argv)
 	std::cout << "Input target: " << inputFile << std::endl;
 	// std::cout << "Output target: " << inputFile << std::endl;
 	
+	// for testing
 	/*std::ifstream input(inputFile, std::ios::binary | std::ios::in);
 	if (!input.good())
 	{
