@@ -210,13 +210,13 @@ void Sdkmesh::LoadSdkmeshMaterial(std::ifstream& inputStream, std::streampos fil
 	std::cout << sdkmesh_materials[num - 1].Force64_6 << std::endl;*/
 }
 
-// for D3D9 with Dec3N and HalfTwo
+// for D3D9 with Dec3N and HalfTwo exlucsively
 void Sdkmesh::LoadSdkmeshVertexBuffer_9(std::ifstream& inputStream, std::streampos fileSize)
 {
 	// tricky
 	uint32_t num_buffer = sdkmesh_header.NumVertexBuffers;
 
-	vertex_buffers.resize(num_buffer);
+	vertex_buffers_9.resize(num_buffer);
 	for (uint32_t i = 0; i < num_buffer; i++)
 	{
 		// seek corresponding offset
@@ -235,9 +235,7 @@ void Sdkmesh::LoadSdkmeshVertexBuffer_9(std::ifstream& inputStream, std::streamp
 		for (uint64_t j = 0; j < num_vertices; j++)
 		{
 			PosNormalTexTan_9 vertex;
-			// usage switch
-			unsigned usage_ind = 0;
-			inputStream.read((char*)&vertex, sizeof(uint32_t));
+			inputStream.read((char*)&vertex, sizeof(PosNormalTexTan_9));
 			vertexBuffer[j] = vertex;
 		}
 		vertex_buffers_9[i] = vertexBuffer;
@@ -415,5 +413,19 @@ void Sdkmesh::CreateFromFile(std::ifstream& inputStream, std::streampos fileSize
 	LoadSdkmeshMaterial(inputStream, fileSize);
 
 	LoadSdkmeshVertexBuffer(inputStream, fileSize);
+	LoadSdkmeshIndexBuffer(inputStream, fileSize);
+}
+
+void Sdkmesh::CreateFromFile_9(std::ifstream& inputStream, std::streampos fileSize)
+{
+	LoadSdkmeshHeader(inputStream, fileSize);
+	LoadSdkmeshVertexBufferHeader(inputStream, fileSize);
+	LoadSdkemshIndexBufferHeader(inputStream, fileSize);
+	LoadSdkmeshMesh(inputStream, fileSize);
+	LoadSdkmeshSubset(inputStream, fileSize);
+	LoadSdkmeshFrame(inputStream, fileSize);
+	LoadSdkmeshMaterial(inputStream, fileSize);
+
+	LoadSdkmeshVertexBuffer_9(inputStream, fileSize);
 	LoadSdkmeshIndexBuffer(inputStream, fileSize);
 }

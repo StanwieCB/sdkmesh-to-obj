@@ -38,7 +38,7 @@ private:
 int WriteOBJ(Sdkmesh& sdkmesh, std::ofstream& output)
 {
 	/// we assume each mesh is bounded to one index buffer and one vertex buffer
-	/// this could be hazardous, if you find any exception or have robust sulution, please PR or email me
+	/// this could be hazardous, if you find any exception or have robust sulotion, please PR or email me
 
 	if ((sdkmesh.GetSdkmeshHeader().NumMeshes != sdkmesh.GetSdkmeshHeader().NumVertexBuffers) ? 1 : 
 		(sdkmesh.GetSdkmeshHeader().NumMeshes != sdkmesh.GetSdkmeshHeader().NumIndexBuffers ? 1 :
@@ -117,6 +117,95 @@ int WriteOBJ(Sdkmesh& sdkmesh, std::ofstream& output)
 	return 0;
 }
 
+// exclusively for D3D9 with PNTT_9
+int WriteOBJ_9(Sdkmesh& sdkmesh, std::ofstream& output)
+{
+	/// we assume each mesh is bounded to one index buffer and one vertex buffer
+	/// this could be hazardous, if you find any exception or have robust sulotion, please PR or email me
+
+	if ((sdkmesh.GetSdkmeshHeader().NumMeshes != sdkmesh.GetSdkmeshHeader().NumVertexBuffers) ? 1 :
+		(sdkmesh.GetSdkmeshHeader().NumMeshes != sdkmesh.GetSdkmeshHeader().NumIndexBuffers ? 1 :
+			sdkmesh.GetSdkmeshHeader().NumVertexBuffers != sdkmesh.GetSdkmeshHeader().NumIndexBuffers))
+	{
+		std::cout << "Currently doesn't support sdkmesh with different mesh number/vertex buffer/index buffer" << std::endl;
+		return -1;
+	}
+
+	const std::vector<std::vector<PosNormalTexTan_9>> vertexBuffers = sdkmesh.GetSdkmeshVertexBuffer_9();
+	std::vector<std::vector<int>> indexBuffers = sdkmesh.GetSdkmeshIndexBuffer();
+
+	// traverse to encode
+	unsigned cnt = 0;
+	uint32_t prevVertexNumTotal = 0;
+	for (; cnt < sdkmesh.GetSdkmeshHeader().NumMeshes; cnt++)
+	{
+		const Sdkmesh::SdkmeshMesh& mesh = sdkmesh.GetSdkmeshMesh()[cnt];
+		// check buffer number
+		if (mesh.VertexBuffers[0] > sdkmesh.GetSdkmeshHeader().NumVertexBuffers)
+			return -1;
+
+		if (mesh.NumVertexBuffers > 1)
+			return -1;
+
+		//vertices
+		std::vector<PosNormalTexTan_9> vb = vertexBuffers[mesh.VertexBuffers[0]];
+		output << "# " << vb.size() << " vertices of mesh " << cnt << "\n\n";
+
+		for (auto vertex : vb)
+			output << "v " << vertex.pos.X << " " << vertex.pos.Y << " " << vertex.pos.Z << "\n";
+		output << "\n";
+
+		for (auto vertex : vb)
+		{
+			// value
+			float X, Y, Z;
+			X = (float)((vertex.norm.total & Dec3NMaskX) >> 22);
+			Y = (float)((vertex.norm.total & Dec3NMaskY) >> 12);
+			Z = (float)((vertex.norm.total & Dec3NMaskZ) >> 2);
+			// sign bit
+			if ((vertex.norm.total & Dec3NMaskXS) >> 31)
+				X = -X;
+			if ((vertex.norm.total & Dec3NMaskYS) >> 21)
+				Y = -Y;
+			if ((vertex.norm.total & Dec3NMaskZS) >> 11)
+				Z = -Z;
+			// normalize [-511.0, 511.0]
+			output<< "vn " << (X / 511.0) << " " << (Y / 511.0) << " " << (Z / 511.0) << "\n";
+		}
+		output << "\n";
+
+		for (auto vertex : vb)
+			output << "vt " << (float)vertex.tex.X << " " << (float)vertex.tex.Y << "\n";
+		output << "\n";
+
+		// check buffer number
+		if (mesh.IndexBuffer > sdkmesh.GetSdkmeshHeader().NumIndexBuffers)
+			return -1;
+
+		// triangle mesh
+		std::vector<int> ib = indexBuffers[mesh.IndexBuffer];
+		output << "g mesh_" << cnt << "_" << mesh.Name << "\n";
+
+		int numTriangles = ib.size() / 3;
+		for (int i = 0; i < numTriangles; i++)
+		{
+			int fir = ib[3 * i] + 1 + prevVertexNumTotal;
+			int sec = ib[3 * i + 1] + 1 + prevVertexNumTotal;
+			int thr = ib[3 * i + 2] + 1 + prevVertexNumTotal;
+			output << "f " << fir << "/" << fir << "/" << fir << " ";
+			output << sec << "/" << sec << "/" << sec << " ";
+			output << thr << "/" << thr << "/" << thr << "\n";
+		}
+
+		prevVertexNumTotal += sdkmesh.GetSdkmeshVertexBufferHeader()[cnt].NumVertices;
+
+		// if (cnt == 2)
+		//	break;
+	}
+
+	return 0;
+}
+
 int Convert(const std::string& inputFile, const std::string& outputFile)
 {
 	std::ifstream input(inputFile, std::ios::binary | std::ios::in);
@@ -140,18 +229,20 @@ int Convert(const std::string& inputFile, const std::string& outputFile)
 	fileSize = input.tellg() - fileSize;
 	input.seekg(0, std::ios::beg);
 
-	Sdkmesh sdkmeshInstane(input, fileSize);
+	Sdkmesh sdkmeshInstane;
+	sdkmeshInstane.CreateFromFile_9(input, fileSize);
 	sdkmeshInstane.DoCheck();
 
 	std::cout << input.tellg() << std::endl;
 	std::cout << fileSize << std::endl;
 
 	// start to dump into .obj output
-	if (WriteOBJ(sdkmeshInstane, output) == -1)
+	if (WriteOBJ_9(sdkmeshInstane, output) == -1)
 	{
 		std::cout << "Dump into .obj failed" << std::endl;
 		input.close();
 		output.close();
+		return -1;
 	}
 
 	input.close();
@@ -165,7 +256,7 @@ int main(int argc, char** argv)
 	std::string inputFile;
 	std::string outputFile;
 
-	Sdkmesh test1 = Sdkmesh();
+	//Sdkmesh test1 = Sdkmesh();
 	// parse arguments
 	if (parser.CmdOptionExists("-i"))
 		inputFile = parser.GetCmdOption("-i");
@@ -198,7 +289,7 @@ int main(int argc, char** argv)
 	fileSize = input.tellg() - fileSize;
 	input.seekg(0, std::ios::beg);
 
-	test1.CreateFromFile(input, fileSize);
+	test1.CreateFromFile_9(input, fileSize);
 
 	std::cout << input.tellg() << std::endl;
 	std::cout << fileSize << std::endl;*/

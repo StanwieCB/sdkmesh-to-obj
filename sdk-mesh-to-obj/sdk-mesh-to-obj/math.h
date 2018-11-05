@@ -32,6 +32,13 @@ const uint32_t INVALID_ANIMATION_DATA = uint32_t(-1);
 const uint32_t INVALID_SAMPLER_SLOT = uint32_t(-1);
 const uint32_t ERROR_RESOURCE_VALUE = 1;
 
+#define Dec3NMaskX 0x7fc00000
+#define Dec3NMaskY 0x001ff000
+#define Dec3NMaskZ 0x000007fc
+#define Dec3NMaskXS 0x80000000
+#define Dec3NMaskYS 0x00200000
+#define Dec3NMaskZS 0x00000800
+
 enum class DeclarationMethod : byte
 {
 	Default = 0,
@@ -101,9 +108,9 @@ public:
 class HalfTwo
 {
 public:
-	uint16_t X;
-	uint16_t Y;
-	HalfTwo() : X(0), Y(0) {}
+	HalfFloat X;
+	HalfFloat Y;
+	HalfTwo() { X = 0.0, Y = 0.0; }
 };
 
 class Dec3

@@ -185,6 +185,7 @@ public:
 	void DoCheck();
 
 	void CreateFromFile(std::ifstream& inputStream, std::streampos fileSize);
+	void CreateFromFile_9(std::ifstream& inputStream, std::streampos fileSize);
 
 	const SdkmeshHeader& GetSdkmeshHeader() { return sdkmesh_header; }
 	const std::vector<SdkmeshVertexBufferHeader>& GetSdkmeshVertexBufferHeader() { return sdkmesh_vertex_buffer_headers; }
