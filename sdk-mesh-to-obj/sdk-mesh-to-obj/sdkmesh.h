@@ -14,7 +14,7 @@
 
 class Sdkmesh
 {
-private:
+public:
 	struct SdkmeshHeader
 	{
 		//basic information
@@ -75,11 +75,13 @@ private:
 
 		union
 		{
-			uint64_t SubsetOffset;		
+			uint64_t SubsetOffset;
+			int* pSubsets;
 		};
 		union
 		{
-			uint64_t FrameInfluenceOffset;		
+			uint64_t FrameInfluenceOffset;
+			uint32_t* pFrameInfluences;
 		};
 	};
 
@@ -148,6 +150,7 @@ private:
 		};
 	};
 
+private:
 	SdkmeshHeader sdkmesh_header;
 	std::vector<SdkmeshVertexBufferHeader> sdkmesh_vertex_buffer_headers;
 	std::vector<SdkmeshIndexBufferHeader> sdkmesh_index_buffer_headers;
@@ -159,6 +162,18 @@ private:
 	std::vector<std::vector<PosNormalTexTan>> vertex_buffers;
 	std::vector<std::vector<int>> index_buffers;
 
+private:
+	void LoadSdkmeshHeader(std::ifstream& inputStream, std::streampos fileSize);
+	void LoadSdkmeshVertexBufferHeader(std::ifstream& inputStream, std::streampos fileSize);
+	void LoadSdkemshIndexBufferHeader(std::ifstream& inputStream, std::streampos fileSize);
+	void LoadSdkmeshMesh(std::ifstream& inputStream, std::streampos fileSize);
+	void LoadSdkmeshSubset(std::ifstream& inputStream, std::streampos fileSize);
+	void LoadSdkmeshFrame(std::ifstream& inputStream, std::streampos fileSize);
+	void LoadSdkmeshMaterial(std::ifstream& inputStream, std::streampos fileSize);
+
+	void LoadSdkmeshVertexBuffer(std::ifstream& inputStream, std::streampos fileSize);
+	void LoadSdkmeshIndexBuffer(std::ifstream& inputStream, std::streampos fileSize);
+
 public:
 	Sdkmesh() { DoCheck(); }
 	Sdkmesh(std::ifstream& inputStream, std::streampos fileSize);
@@ -168,17 +183,6 @@ public:
 	void DoCheck();
 
 	void CreateFromFile(std::ifstream& inputStream, std::streampos fileSize);
-
-	void LoadSdkmeshHeader(std::ifstream& inputStream, std::streampos fileSize);
-	void LoadSdkmeshVertexBufferHeader(std::ifstream& inputStream, std::streampos fileSize);
-	void LoadSdkemshIndexBufferHeader(std::ifstream& inputStream, std::streampos fileSize);
-	void LoadSdkmeshMesh(std::ifstream& inputStream, std::streampos fileSize);
-	void LoadSdkmeshSubset(std::ifstream& inputStream, std::streampos fileSize);
-	void LoadSdkmeshFrame(std::ifstream& inputStream, std::streampos fileSize);
-	void LoadSdkmeshMaterial(std::ifstream& inputStream, std::streampos fileSize);
-	
-	void LoadSdkmeshVertexBuffer(std::ifstream& inputStream, std::streampos fileSize);
-	void LoadSdkmeshIndexBuffer(std::ifstream& inputStream, std::streampos fileSize);
 
 	const SdkmeshHeader& GetSdkmeshHeader() { return sdkmesh_header; }
 	const std::vector<SdkmeshVertexBufferHeader>& GetSdkmeshVertexBufferHeader() { return sdkmesh_vertex_buffer_headers; }

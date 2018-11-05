@@ -52,61 +52,66 @@ int WriteOBJ(Sdkmesh& sdkmesh, std::ofstream& output)
 	std::vector<std::vector<int>> indexBuffers = sdkmesh.GetSdkmeshIndexBuffer();
 
 	// traverse to encode
-	// a bit silly but seems no < O(n^2) way, if you have please PR, much appreciation!
-
-	// vertices pos
-	output << "# List of geometric vertices, with (x, y, z [,w]) coordinates, w is optional and defaults to 1.0\n";
-	for (auto mesh : sdkmesh.GetSdkmeshMesh())
+	unsigned cnt = 0;
+	uint64_t prevIndexNumTotal = 0;
+	for (; cnt < sdkmesh.GetSdkmeshHeader().NumMeshes; cnt++)
 	{
+		const Sdkmesh::SdkmeshMesh& mesh = sdkmesh.GetSdkmeshMesh()[cnt];
+		// check buffer number
 		if (mesh.VertexBuffers[0] > sdkmesh.GetSdkmeshHeader().NumVertexBuffers)
 			return -1;
 
-		std::vector<PosNormalTexTan> buffer = vertexBuffers[mesh.VertexBuffers[0]];
-		for (auto vertex : buffer)
-			output << "v " << vertex.pos.X << " " << vertex.pos.Y << " " << vertex.pos.Z << " 1.0\n";
-	}
-
-	// vertices tex
-	output << "# List of texture coordinates, in (u, v [,w]) coordinates, these will vary between 0 and 1, w is optional and defaults to 0.\n";
-	for (auto mesh : sdkmesh.GetSdkmeshMesh())
-	{
-		if (mesh.VertexBuffers[0] > sdkmesh.GetSdkmeshHeader().NumVertexBuffers)
+		if (mesh.NumVertexBuffers > 1)
 			return -1;
 
-		std::vector<PosNormalTexTan> buffer = vertexBuffers[mesh.VertexBuffers[0]];
-		for (auto vertex : buffer)
-			output << "vt " << vertex.tex.X << " " << vertex.tex.Y << " 0\n";
-	}
+		//vertices
+		std::vector<PosNormalTexTan> vb = vertexBuffers[mesh.VertexBuffers[0]];
+		output << "# " << vb.size() << " vertices of mesh " << cnt << "\n\n";
 
-	// vertices norm
-	output << "# List of vertex normals in (x,y,z) form; normals might not be unit vectors.\n";
-	for (auto mesh : sdkmesh.GetSdkmeshMesh())
-	{
-		if (mesh.VertexBuffers[0] > sdkmesh.GetSdkmeshHeader().NumVertexBuffers)
-			return -1;
+		if (sdkmesh.GetSdkmeshVertexBufferHeader()[cnt].Decl[0].usage == DeclarationUsage::Position)
+		{
+			for (auto vertex : vb)
+				output << "v " << vertex.pos.X << " " << vertex.pos.Y << " " << vertex.pos.Z << "\n";
+			output << "\n";
+		}
 
-		std::vector<PosNormalTexTan> buffer = vertexBuffers[mesh.VertexBuffers[0]];
-		for (auto vertex : buffer)
-			output << "vn " << vertex.norm.X << " " << vertex.norm.Y << " " << vertex.norm.Z << "\n";
-	}
+		if (sdkmesh.GetSdkmeshVertexBufferHeader()[cnt].Decl[1].usage == DeclarationUsage::Normal)
+		{
+			for (auto vertex : vb)
+				output << "vn " << vertex.norm.X << " " << vertex.norm.Y << " " << vertex.norm.Z << "\n";
+			output << "\n";
+		}
 
-	// mesh indices
-	output << " # Polygonal face element v1/vt1/vn1 v2/vt2/vn2 v3/vt3/vn3.\n";
-	for (auto mesh : sdkmesh.GetSdkmeshMesh())
-	{
+		if (sdkmesh.GetSdkmeshVertexBufferHeader()[cnt].Decl[2].usage == DeclarationUsage::TextureCoordinate)
+		{
+			for (auto vertex : vb)
+				output << "vt " << vertex.tex.X << " " << vertex.tex.Y << "\n";
+			output << "\n";
+		}
+
+		// check buffer number
 		if (mesh.IndexBuffer > sdkmesh.GetSdkmeshHeader().NumIndexBuffers)
 			return -1;
 
-		std::vector<int> buffer = indexBuffers[mesh.IndexBuffer];
-
 		// triangle mesh
-		int numTriangles = buffer.size() / 3;
+		std::vector<int> ib = indexBuffers[mesh.IndexBuffer];
+		output << "g mesh_" << cnt << "_" << mesh.Name << "\n";
+
+		int numTriangles = ib.size() / 3;
 		for (int i = 0; i < numTriangles; i++)
 		{
-			output << "f " << buffer[3 * i] << "/" << buffer[3 * i] << "/" << buffer[3 * i] << " ";
-			output << buffer[3 * i + 1] << "/" << buffer[3 * i + 1] << "/" << buffer[3 * i + 1] << " ";
-			output << buffer[3 * i + 2] << "/" << buffer[3 * i + 2] << "/" << buffer[3 * i + 2] << "\n";
+			int fir = ib[3 * i] + 1 + prevIndexNumTotal;
+			int sec = ib[3 * i + 1] + 1 + prevIndexNumTotal;
+			int thr = ib[3 * i + 2] + 1 + prevIndexNumTotal;
+			output << "f " << fir << "/" << fir << "/" << fir << " ";
+			output << sec << "/" << sec << "/" << sec << " ";
+			output << thr << "/" << thr << "/" << thr << "\n";
 		}
+
+		prevIndexNumTotal += sdkmesh.GetSdkemshIndexBufferHeader()[cnt].NumIndices;
+
+		// if (cnt == 2)
+		//	break;
 	}
 
 	return 0;
@@ -121,7 +126,7 @@ int Convert(const std::string& inputFile, const std::string& outputFile)
 		input.close();
 		return -1;
 	}
-	if (outputFile.substr(outputFile.size() - 4) != ".obj")
+	if (outputFile.size() <= 4 || outputFile.substr(outputFile.size() - 4) != ".obj")
 	{
 		std::cout << "Please speficy an .obj output" << std::endl;
 		return -1;
@@ -136,6 +141,10 @@ int Convert(const std::string& inputFile, const std::string& outputFile)
 	input.seekg(0, std::ios::beg);
 
 	Sdkmesh sdkmeshInstane(input, fileSize);
+	sdkmeshInstane.DoCheck();
+
+	std::cout << input.tellg() << std::endl;
+	std::cout << fileSize << std::endl;
 
 	// start to dump into .obj output
 	if (WriteOBJ(sdkmeshInstane, output) == -1)
@@ -156,8 +165,7 @@ int main(int argc, char** argv)
 	std::string inputFile;
 	std::string outputFile;
 
-	Sdkmesh sdkmesh1 = Sdkmesh();
-	sdkmesh1.DoCheck();
+	Sdkmesh test1 = Sdkmesh();
 
 	// parse arguments
 	if (parser.CmdOptionExists("-i"))
@@ -168,7 +176,7 @@ int main(int argc, char** argv)
 		return -1;
 	}
 	if (parser.CmdOptionExists("-o"))
-		inputFile = parser.GetCmdOption("-o");
+		outputFile = parser.GetCmdOption("-o");
 	else
 	{
 		std::cout << "Empty output file name!" << std::endl;
@@ -176,7 +184,7 @@ int main(int argc, char** argv)
 	}
 
 	std::cout << "Input target: " << inputFile << std::endl;
-	std::cout << "Output target: " << inputFile << std::endl;
+	std::cout << "Output target: " << outputFile << std::endl;
 	
 	// for testing
 	/*std::ifstream input(inputFile, std::ios::binary | std::ios::in);
@@ -191,19 +199,23 @@ int main(int argc, char** argv)
 	fileSize = input.tellg() - fileSize;
 	input.seekg(0, std::ios::beg);
 
-	sdkmesh1.CreateFromFile(input, fileSize);
-	std::cout << sdkmesh1.GetSdkmeshHeader().NumMeshes << std::endl;
-	std::cout << sdkmesh1.GetSdkmeshHeader().NumVertexBuffers << std::endl;
-	std::cout << sdkmesh1.GetSdkmeshHeader().NumIndexBuffers << std::endl;
-	std::cout << sdkmesh1.GetSdkmeshMesh()[1].NumVertexBuffers << std::endl;
-	std::cout << sdkmesh1.GetSdkmeshMesh()[1].NumSubsets << std::endl;
+	test1.CreateFromFile(input, fileSize);
+
+	std::cout << input.tellg() << std::endl;
+	std::cout << fileSize << std::endl;*/
+
+	/*std::cout << test1.GetSdkmeshHeader().NumMeshes << std::endl;
+	std::cout << test1.GetSdkmeshHeader().NumVertexBuffers << std::endl;
+	std::cout << test1.GetSdkmeshHeader().NumIndexBuffers << std::endl;
+	std::cout << test1.GetSdkmeshMesh()[1].NumVertexBuffers << std::endl;
+	std::cout << test1.GetSdkmeshMesh()[1].NumSubsets << std::endl;
 	std::cout << input.tellg() << std::endl;
 	std::cout << fileSize << std::endl;*/
 
 	if (Convert(inputFile, outputFile) == -1)
 		return -1;
 
-	std::cout << "Convert: " << inputFile << " to " << outputFile << " finished" << std::endl;
+	std::cout << "Convert " << inputFile << " to " << outputFile << " finished" << std::endl;
 	
 	return 0;
 }

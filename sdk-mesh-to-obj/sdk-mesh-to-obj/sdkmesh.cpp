@@ -73,6 +73,7 @@ void Sdkmesh::LoadSdkmeshHeader(std::ifstream& inputStream, std::streampos fileS
 
 void Sdkmesh::LoadSdkmeshVertexBufferHeader(std::ifstream& inputStream, std::streampos fileSize)
 {
+	inputStream.seekg(sdkmesh_header.VertexStreamHeadersOffset, std::ios::beg);
 	std::streampos pos = inputStream.tellg();
 	if (fileSize - pos < sizeof(SdkmeshVertexBufferHeader))
 		throw std::exception("EOF before reading Sdkmesh_vertex_buffer_header");
@@ -107,15 +108,16 @@ void Sdkmesh::LoadSdkmeshVertexBufferHeader(std::ifstream& inputStream, std::str
 	// vertex elemet structure (input Squidroom): 
 	//    usage        type      method      size
 	// 1. pos          Float3    default     
-	// 2. normal       Dec3N     default     4
+	// 2. normal       Dec3N     default     
 	// 3. textureCord  HalfTwo   default
-	// 4. tangent      Dec3N     default     4
+	// 4. tangent      Dec3N     default     
 
 }
 
 
 void Sdkmesh::LoadSdkemshIndexBufferHeader(std::ifstream& inputStream, std::streampos fileSize)
 {
+	inputStream.seekg(sdkmesh_header.IndexStreamHeadersOffset, std::ios::beg);
 	std::streampos pos = inputStream.tellg();
 	if (fileSize - pos < sizeof(SdkmeshIndexBufferHeader))
 		throw std::exception("EOF before reading Sdkmesh_index_buffer_header");
@@ -137,6 +139,7 @@ void Sdkmesh::LoadSdkemshIndexBufferHeader(std::ifstream& inputStream, std::stre
 
 void Sdkmesh::LoadSdkmeshMesh(std::ifstream& inputStream, std::streampos fileSize)
 {
+	inputStream.seekg(sdkmesh_header.MeshDataOffset, std::ios::beg);
 	std::streampos pos = inputStream.tellg();
 	if (fileSize - pos < sizeof(SdkmeshMesh))
 		throw std::exception("EOF before reading Sdkmesh_meshes");
@@ -153,6 +156,7 @@ void Sdkmesh::LoadSdkmeshMesh(std::ifstream& inputStream, std::streampos fileSiz
 
 void Sdkmesh::LoadSdkmeshSubset(std::ifstream& inputStream, std::streampos fileSize)
 {
+	inputStream.seekg(sdkmesh_header.SubsetDataOffset, std::ios::beg);
 	std::streampos pos = inputStream.tellg();
 	if (fileSize - pos < sizeof(SdkmeshSubset))
 		throw std::exception("EOF before reading Sdkmesh_SdkmeshSubset");
@@ -169,6 +173,7 @@ void Sdkmesh::LoadSdkmeshSubset(std::ifstream& inputStream, std::streampos fileS
 
 void Sdkmesh::LoadSdkmeshFrame(std::ifstream& inputStream, std::streampos fileSize)
 {
+	inputStream.seekg(sdkmesh_header.FrameDataOffset, std::ios::beg);
 	std::streampos pos = inputStream.tellg();
 	if (fileSize - pos < sizeof(SdkmeshFrame))
 		throw std::exception("EOF before reading Sdkmesh_SdkmeshFrame");
@@ -185,6 +190,7 @@ void Sdkmesh::LoadSdkmeshFrame(std::ifstream& inputStream, std::streampos fileSi
 
 void Sdkmesh::LoadSdkmeshMaterial(std::ifstream& inputStream, std::streampos fileSize)
 {
+	inputStream.seekg(sdkmesh_header.MaterialDataOffset, std::ios::beg);
 	std::streampos pos = inputStream.tellg();
 	if (fileSize - pos < sizeof(SdkmeshMaterial))
 		throw std::exception("EOF before reading Sdkmesh_SdkmeshMaterial");
@@ -314,18 +320,16 @@ void Sdkmesh::LoadSdkmeshIndexBuffer(std::ifstream& inputStream, std::streampos 
 		indexBuffer.resize(num_indices);
 		for (uint64_t j = 0; j < num_indices; j++)
 		{
-			int index;
 			// usage switch
 			switch (sdkmesh_index_buffer_headers[i].IndexType)
 			{
 			case 0:
-				inputStream.read((char*)&index, sizeof(uint16_t));
+				inputStream.read((char*)&indexBuffer[j], sizeof(uint16_t));
 				break;
 			default:
-				inputStream.read((char*)&index, sizeof(uint32_t));
+				inputStream.read((char*)&indexBuffer[j], sizeof(uint32_t));
 				break;
 			}
-			indexBuffer[j] = index;
 		}
 		index_buffers[i] = indexBuffer;
 	}
@@ -342,7 +346,7 @@ Sdkmesh::Sdkmesh(std::ifstream& inputStream, std::streampos fileSize)
 	LoadSdkmeshMaterial(inputStream, fileSize);
 
 	LoadSdkmeshVertexBuffer(inputStream, fileSize);
-	//LoadSdkmeshIndexBuffer(inputStream, fileSize);
+	LoadSdkmeshIndexBuffer(inputStream, fileSize);
 }
 
 void Sdkmesh::CreateFromFile(std::ifstream& inputStream, std::streampos fileSize)
