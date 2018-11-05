@@ -32,5 +32,13 @@
     <ClInclude Include="sdkmesh.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="umHalf.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="umHalf.inl">
+      <Filter>Header Files</Filter>
+    </None>
   </ItemGroup>
 </Project>

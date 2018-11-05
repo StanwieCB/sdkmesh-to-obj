@@ -154,6 +154,10 @@
     <ClInclude Include="math.h" />
     <ClInclude Include="obj.h" />
     <ClInclude Include="sdkmesh.h" />
+    <ClInclude Include="umHalf.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="umHalf.inl" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

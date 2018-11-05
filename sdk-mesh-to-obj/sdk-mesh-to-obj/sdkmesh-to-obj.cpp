@@ -53,7 +53,7 @@ int WriteOBJ(Sdkmesh& sdkmesh, std::ofstream& output)
 
 	// traverse to encode
 	unsigned cnt = 0;
-	uint64_t prevIndexNumTotal = 0;
+	uint32_t prevIndexNumTotal = 0;
 	for (; cnt < sdkmesh.GetSdkmeshHeader().NumMeshes; cnt++)
 	{
 		const Sdkmesh::SdkmeshMesh& mesh = sdkmesh.GetSdkmeshMesh()[cnt];
@@ -166,7 +166,6 @@ int main(int argc, char** argv)
 	std::string outputFile;
 
 	Sdkmesh test1 = Sdkmesh();
-
 	// parse arguments
 	if (parser.CmdOptionExists("-i"))
 		inputFile = parser.GetCmdOption("-i");

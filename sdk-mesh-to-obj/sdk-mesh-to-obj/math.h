@@ -12,6 +12,8 @@
 #include <vector>
 #include <string>
 
+#include "umHalf.h"
+
 typedef unsigned char byte;
 const uint32_t SDKMESH_FILE_VERSION = 101;
 const uint32_t MAX_VERTEX_ELEMENTS = 32;
@@ -96,6 +98,23 @@ public:
 		: stream(stream), offset(offset), type(declarationType), method(declarationMethod), usage(declarationUsage), usage_index(usageIndex) {}*/
 };
 
+class HalfTwo
+{
+public:
+	uint16_t X;
+	uint16_t Y;
+	HalfTwo() : X(0), Y(0) {}
+};
+
+class Dec3
+{
+public:
+	// X  Y  Z  w
+	// 10 10 10 2  bit long
+	uint32_t total;
+	Dec3() : total(0) {};
+};
+
 class Vec2
 {
 public:
@@ -149,5 +168,21 @@ public:
 	PosNormalTexTan(Vec3 position, Vec3 normal, Vec2 texture, Vec3 tangent)
 		: pos(position), norm(normal), tex(texture), tan(tangent) {}
 };
+
+
+// Dec3N and HalfTwo are really tricky to decode
+class PosNormalTexTan_9
+{
+public:
+	Vec3 pos;
+	Dec3 norm;
+	HalfTwo tex;
+	Dec3 tan;
+
+	PosNormalTexTan_9() {};
+	PosNormalTexTan_9(Vec3 position, Dec3 normal, HalfTwo texture, Dec3 tangent)
+		: pos(position), norm(normal), tex(texture), tan(tangent) {}
+};
+
 
 #endif

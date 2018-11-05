@@ -210,6 +210,61 @@ void Sdkmesh::LoadSdkmeshMaterial(std::ifstream& inputStream, std::streampos fil
 	std::cout << sdkmesh_materials[num - 1].Force64_6 << std::endl;*/
 }
 
+// for D3D9 with Dec3N and HalfTwo
+void Sdkmesh::LoadSdkmeshVertexBuffer_9(std::ifstream& inputStream, std::streampos fileSize)
+{
+	// tricky
+	uint32_t num_buffer = sdkmesh_header.NumVertexBuffers;
+
+	vertex_buffers.resize(num_buffer);
+	for (uint32_t i = 0; i < num_buffer; i++)
+	{
+		// seek corresponding offset
+		inputStream.seekg(sdkmesh_vertex_buffer_headers[i].DataOffset, std::ios::beg);
+		// don't knwo if we need padding StrideBytes, reserve for later
+
+		uint64_t num_vertices = sdkmesh_vertex_buffer_headers[i].NumVertices;
+		if ((uint64_t)inputStream.tellg() + num_vertices * sizeof(PosNormalTexTan_9) > fileSize)
+		{
+			std::cout << "EOF before reading vertex buffer " << i << std::endl;
+			throw std::exception("EOF before reading vertex buffer %d", i);
+		}
+
+		std::vector<PosNormalTexTan_9> vertexBuffer;
+		vertexBuffer.resize(num_vertices);
+		for (uint64_t j = 0; j < num_vertices; j++)
+		{
+			PosNormalTexTan_9 vertex;
+			// usage switch
+			unsigned usage_ind = 0;
+			inputStream.read((char*)&vertex, sizeof(uint32_t));
+			vertexBuffer[j] = vertex;
+		}
+		vertex_buffers_9[i] = vertexBuffer;
+	}
+
+	// print to check
+	/*std::cout << vertex_buffers[0][0].pos.X << std::endl;
+	std::cout << vertex_buffers[0][0].pos.Y << std::endl;
+	std::cout << vertex_buffers[0][0].pos.Z << std::endl;
+	std::cout << vertex_buffers[0][0].norm.X << std::endl;
+	std::cout << vertex_buffers[0][0].norm.Y << std::endl;
+	std::cout << vertex_buffers[0][0].norm.Z << std::endl;
+	std::cout << vertex_buffers[0][0].tan.X << std::endl;
+	std::cout << vertex_buffers[0][0].tan.Y << std::endl;
+	std::cout << vertex_buffers[0][0].tan.Z << std::endl;
+	std::cout << std::endl;
+	std::cout << vertex_buffers[num_buffer - 1][sdkmesh_vertex_buffer_headers[num_buffer - 1].NumVertices - 1].pos.X << std::endl;
+	std::cout << vertex_buffers[num_buffer - 1][sdkmesh_vertex_buffer_headers[num_buffer - 1].NumVertices - 1].pos.Y << std::endl;
+	std::cout << vertex_buffers[num_buffer - 1][sdkmesh_vertex_buffer_headers[num_buffer - 1].NumVertices - 1].pos.Z << std::endl;
+	std::cout << vertex_buffers[num_buffer - 1][sdkmesh_vertex_buffer_headers[num_buffer - 1].NumVertices - 1].norm.X << std::endl;
+	std::cout << vertex_buffers[num_buffer - 1][sdkmesh_vertex_buffer_headers[num_buffer - 1].NumVertices - 1].norm.Y << std::endl;
+	std::cout << vertex_buffers[num_buffer - 1][sdkmesh_vertex_buffer_headers[num_buffer - 1].NumVertices - 1].norm.Z << std::endl;
+	std::cout << vertex_buffers[num_buffer - 1][sdkmesh_vertex_buffer_headers[num_buffer - 1].NumVertices - 1].tan.X << std::endl;
+	std::cout << vertex_buffers[num_buffer - 1][sdkmesh_vertex_buffer_headers[num_buffer - 1].NumVertices - 1].tan.Y << std::endl;
+	std::cout << vertex_buffers[num_buffer - 1][sdkmesh_vertex_buffer_headers[num_buffer - 1].NumVertices - 1].tan.Z << std::endl;*/
+}
+
 void Sdkmesh::LoadSdkmeshVertexBuffer(std::ifstream& inputStream, std::streampos fileSize)
 {
 	// tricky
@@ -247,7 +302,7 @@ void Sdkmesh::LoadSdkmeshVertexBuffer(std::ifstream& inputStream, std::streampos
 					inputStream.read((char*)&vertex.norm, sizeof(Vec3));
 					break;
 				case DeclarationUsage::TextureCoordinate:
-					inputStream.read((char*)&vertex.tex, sizeof(Vec2));
+					inputStream.read((char*)&vertex.tex, sizeof(HalfTwo));
 					break;
 				case DeclarationUsage::Tangent:
 					inputStream.read((char*)&vertex.tan, sizeof(Vec3));
@@ -301,14 +356,14 @@ void Sdkmesh::LoadSdkmeshIndexBuffer(std::ifstream& inputStream, std::streampos 
 		switch (sdkmesh_index_buffer_headers[i].IndexType)
 		{
 		case 0:
-			if ((uint64_t)inputStream.tellg() + num_indices * sizeof(uint16_t) > fileSize)
+			if ((uint64_t)inputStream.tellg() + num_indices * sizeof(uint16_t) > (uint64_t)fileSize)
 			{
 				std::cout << "EOF before reading index buffer " << i << std::endl;
 				throw std::exception("EOF before reading index buffer %d", i);
 			}
 			break;
 		default:
-			if ((uint64_t)inputStream.tellg() + num_indices * sizeof(uint32_t) > fileSize)
+			if ((uint64_t)inputStream.tellg() + num_indices * sizeof(uint32_t) > (uint64_t)fileSize)
 			{
 				std::cout << "EOF before reading index buffer " << i << std::endl;
 				throw std::exception("EOF before reading index buffer %d", i);
