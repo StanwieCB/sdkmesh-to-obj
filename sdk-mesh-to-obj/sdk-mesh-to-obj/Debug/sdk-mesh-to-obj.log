@@ -1,5 +1,2 @@
-﻿  sdkmesh-to-obj.cpp
-c:\users\fightingforpubg\desktop\sdkmesh-to-obj\sdk-mesh-to-obj\sdk-mesh-to-obj\sdkmesh-to-obj.cpp(111): warning C4244: '+=': conversion from 'const uint64_t' to 'uint32_t', possible loss of data
-c:\users\fightingforpubg\desktop\sdkmesh-to-obj\sdk-mesh-to-obj\sdk-mesh-to-obj\sdkmesh-to-obj.cpp(200): warning C4244: '+=': conversion from 'const uint64_t' to 'uint32_t', possible loss of data
-  sdk-mesh-to-obj.vcxproj -> C:\Users\fightingforPUBG\Desktop\sdkmesh-to-obj\sdk-mesh-to-obj\Debug\sdk-mesh-to-obj.exe
+﻿  sdk-mesh-to-obj.vcxproj -> C:\Users\fightingforPUBG\Desktop\sdkmesh-to-obj\sdk-mesh-to-obj\Debug\sdk-mesh-to-obj.exe
   sdk-mesh-to-obj.vcxproj -> C:\Users\fightingforPUBG\Desktop\sdkmesh-to-obj\sdk-mesh-to-obj\Debug\sdk-mesh-to-obj.pdb (Full PDB)

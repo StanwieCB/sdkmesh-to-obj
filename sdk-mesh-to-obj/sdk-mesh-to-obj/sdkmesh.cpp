@@ -204,10 +204,10 @@ void Sdkmesh::LoadSdkmeshMaterial(std::ifstream& inputStream, std::streampos fil
 	}
 
 	// print to check
-	/*std::cout << sdkmesh_materials[num - 1].Name << std::endl;
+	std::cout << sdkmesh_materials[num - 1].Name << std::endl;
 	std::cout << sdkmesh_materials[num - 1].MaterialInstancePath << std::endl;
 	std::cout << sdkmesh_materials[num - 1].DiffuseTexture << std::endl;
-	std::cout << sdkmesh_materials[num - 1].Force64_6 << std::endl;*/
+	std::cout << sdkmesh_materials[num - 1].Force64_6 << std::endl;
 }
 
 // for D3D9 with Dec3N and HalfTwo exlucsively

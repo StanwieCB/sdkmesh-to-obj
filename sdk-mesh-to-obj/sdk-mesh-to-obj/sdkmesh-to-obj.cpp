@@ -9,6 +9,9 @@
 #include "sdkmesh.h"
 
 #include <iostream>
+#include <filesystem>
+
+namespace fs = std::experimental::filesystem;
 
 class InputParser {
 public:
@@ -206,6 +209,58 @@ int WriteOBJ_9(Sdkmesh& sdkmesh, std::ofstream& output)
 	return 0;
 }
 
+int WriteMTL(Sdkmesh& sdkmesh, std::ofstream& output)
+{
+	/// write mtl if sdkmesh has material definition
+	// test number
+	if (sdkmesh.GetSdkmeshHeader().NumMaterials < 1)
+		return 0;
+
+	output << "# Materials for converted sdkmesh\n\n";
+	std::vector<Sdkmesh::SdkmeshMaterial> materials = sdkmesh.GetSdkmeshMaterial();
+	for (auto mat : materials)
+	{
+		output << "newmtl " << mat.Name << "\n";
+
+		// brutally convert non-defined attributes
+		output << "Ns 10.0000\n";
+		output << "Ni 1.5000\n";
+		output << "Tr 0.0000\n";
+		output << "illum 2\n";
+
+		// hack for squidroom
+		output << "Ka 0.5880 0.5880 0.5880\n";
+		output << "Kd 0.5880 0.5880 0.5880\n";
+		
+		// Color
+		output << "Ks " << mat.Specular.r << " " << mat.Specular.g << " " << mat.Specular.b << "\n";
+		output << "Ks " << mat.Emissive.r << " " << mat.Emissive.g << " " << mat.Emissive.b << "\n";
+
+		fs::path dir = mat.MaterialInstancePath;
+		std::string matDstr = mat.DiffuseTexture;
+		std::string matSstr = mat.SpecularTexture;
+		std::string matNstr = mat.NormalTexture;
+		if (!matDstr.empty())
+		{
+			fs::path matD = (matDstr.substr(0,matDstr.size()-4) + ".png");
+			output << "map_Ka " << dir / matD << "\n";
+			output << "map_Kd " << dir / matD << "\n";
+		}
+		if (!matSstr.empty())
+		{
+			fs::path matS = (matSstr.substr(0, matSstr.size() - 4) + ".png");
+			output << "map_Ks " << dir / matS << "\n";
+		}
+		if (!matNstr.empty())
+		{
+			fs::path matN = (matNstr.substr(0, matNstr.size() - 4) + ".png");
+			output << "norm " << dir / matN << "\n";
+			output << "map_bump " << dir / matN << "\n";
+		}
+		output << "\n";
+	}
+}
+
 int Convert(const std::string& inputFile, const std::string& outputFile)
 {
 	std::ifstream input(inputFile, std::ios::binary | std::ios::in);
@@ -220,7 +275,8 @@ int Convert(const std::string& inputFile, const std::string& outputFile)
 		std::cout << "Please speficy an .obj output" << std::endl;
 		return -1;
 	}
-	std::ofstream output(outputFile, std::ios::out | std::ios::binary);
+	std::ofstream output_obj(outputFile, std::ios::out | std::ios::binary);
+	std::ofstream output_mtl(outputFile.substr(0, outputFile.size() - 4)+".mtl", std::ios::out | std::ios::binary);
 
 	// traverse to count size
 	// a bit silly but an accurate way
@@ -237,16 +293,27 @@ int Convert(const std::string& inputFile, const std::string& outputFile)
 	std::cout << fileSize << std::endl;
 
 	// start to dump into .obj output
-	if (WriteOBJ_9(sdkmeshInstane, output) == -1)
+	if (WriteOBJ_9(sdkmeshInstane, output_obj) == -1)
 	{
 		std::cout << "Dump into .obj failed" << std::endl;
 		input.close();
-		output.close();
+		output_obj.close();
+		output_mtl.close();
+		return -1;
+	}
+
+	if (WriteMTL(sdkmeshInstane, output_mtl) == -1)
+	{
+		std::cout << "Dump into .mtl failed" << std::endl;
+		input.close();
+		output_obj.close();
+		output_mtl.close();
 		return -1;
 	}
 
 	input.close();
-	output.close();
+	output_obj.close(); 
+	output_mtl.close();
 	return 0;
 }
 
