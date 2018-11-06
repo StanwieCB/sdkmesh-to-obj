@@ -323,7 +323,6 @@ int main(int argc, char** argv)
 	std::string inputFile;
 	std::string outputFile;
 
-	//Sdkmesh test1 = Sdkmesh();
 	// parse arguments
 	if (parser.CmdOptionExists("-i"))
 		inputFile = parser.GetCmdOption("-i");
@@ -342,33 +341,8 @@ int main(int argc, char** argv)
 
 	std::cout << "Input target: " << inputFile << std::endl;
 	std::cout << "Output target: " << outputFile << std::endl;
-	
-	// for testing
-	/*std::ifstream input(inputFile, std::ios::binary | std::ios::in);
-	if (!input.good())
-	{
-		std::cout << "Input file does not exist" << std::endl;
-		return -1;
-	}
 
-	std::streampos fileSize = input.tellg();
-	input.seekg(0, std::ios::end);
-	fileSize = input.tellg() - fileSize;
-	input.seekg(0, std::ios::beg);
-
-	test1.CreateFromFile_9(input, fileSize);
-
-	std::cout << input.tellg() << std::endl;
-	std::cout << fileSize << std::endl;*/
-
-	/*std::cout << test1.GetSdkmeshHeader().NumMeshes << std::endl;
-	std::cout << test1.GetSdkmeshHeader().NumVertexBuffers << std::endl;
-	std::cout << test1.GetSdkmeshHeader().NumIndexBuffers << std::endl;
-	std::cout << test1.GetSdkmeshMesh()[1].NumVertexBuffers << std::endl;
-	std::cout << test1.GetSdkmeshMesh()[1].NumSubsets << std::endl;
-	std::cout << input.tellg() << std::endl;
-	std::cout << fileSize << std::endl;*/
-
+	// convert
 	if (Convert(inputFile, outputFile) == -1)
 		return -1;
 

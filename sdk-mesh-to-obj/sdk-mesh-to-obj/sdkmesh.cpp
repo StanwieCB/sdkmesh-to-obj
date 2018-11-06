@@ -61,14 +61,6 @@ void Sdkmesh::LoadSdkmeshHeader(std::ifstream& inputStream, std::streampos fileS
 	if (sdkmesh_header.NumMaterials == 0)
 		throw std::exception("No materials found");
 
-	// print to check
-	/*std::cout << "sdkmesh_header.version: " << sdkmesh_header.version << std::endl;
-	std::cout << "sdkmesh_header.IsBigEndian: " << sdkmesh_header.IsBigEndian << std::endl;
-	std::cout << "sdkmesh_header.HeaderSize: " << sdkmesh_header.HeaderSize << std::endl;
-	std::cout << "sdkmesh_header.NonBufferDataSize: " << sdkmesh_header.NonBufferDataSize << std::endl;
-	std::cout << "sdkmesh_header.BufferDataSize: " << sdkmesh_header.BufferDataSize << std::endl;
-	std::cout << "sdkmesh_header.NumMeshes: " << sdkmesh_header.NumMeshes << std::endl;*/
-
 }
 
 void Sdkmesh::LoadSdkmeshVertexBufferHeader(std::ifstream& inputStream, std::streampos fileSize)
@@ -84,26 +76,6 @@ void Sdkmesh::LoadSdkmeshVertexBufferHeader(std::ifstream& inputStream, std::str
 	{
 		inputStream.read((char*)&(sdkmesh_vertex_buffer_headers[i]), sizeof(SdkmeshVertexBufferHeader));
 	}
-
-	// print to check end decode
-	/*std::cout << "sdkmesh_vertex_header_buffers[0].NumVertices: " << sdkmesh_vertex_header_buffers[0].NumVertices << std::endl;
-	std::cout << "sdkmesh_vertex_header_buffers[0].SizeBytes: " << sdkmesh_vertex_header_buffers[0].SizeBytes << std::endl;
-	std::cout << "sdkmesh_vertex_header_buffers[0].StrideBytes: " << sdkmesh_vertex_header_buffers[0].StrideBytes << std::endl;
-	std::cout << "sdkmesh_vertex_header_buffers[1].Declaration[0] Method:" << (int)sdkmesh_vertex_header_buffers[1].Decl[0].method << std::endl;
-	std::cout << "sdkmesh_vertex_header_buffers[1].Declaration[0] usage:" << (int)sdkmesh_vertex_header_buffers[1].Decl[0].usage << std::endl;
-	std::cout << "sdkmesh_vertex_header_buffers[1].Declaration[0] type:" << (int)sdkmesh_vertex_header_buffers[1].Decl[0].type << std::endl;
-	std::cout << "sdkmesh_vertex_header_buffers[1].Declaration[1] Method:" << (int)sdkmesh_vertex_header_buffers[1].Decl[1].method << std::endl;
-	std::cout << "sdkmesh_vertex_header_buffers[1].Declaration[1] usage:" << (int)sdkmesh_vertex_header_buffers[1].Decl[1].usage << std::endl;
-	std::cout << "sdkmesh_vertex_header_buffers[1].Declaration[1] type:" << (int)sdkmesh_vertex_header_buffers[1].Decl[1].type << std::endl;
-	std::cout << "sdkmesh_vertex_header_buffers[1].Declaration[2] Method:" << (int)sdkmesh_vertex_header_buffers[1].Decl[2].method << std::endl;
-	std::cout << "sdkmesh_vertex_header_buffers[1].Declaration[2] usage:" << (int)sdkmesh_vertex_header_buffers[1].Decl[2].usage << std::endl;
-	std::cout << "sdkmesh_vertex_header_buffers[1].Declaration[2] type:" << (int)sdkmesh_vertex_header_buffers[1].Decl[2].type << std::endl;
-	std::cout << "sdkmesh_vertex_header_buffers[1].Declaration[3] Method:" << (int)sdkmesh_vertex_header_buffers[1].Decl[3].method << std::endl;
-	std::cout << "sdkmesh_vertex_header_buffers[1].Declaration[3] usage:" << (int)sdkmesh_vertex_header_buffers[1].Decl[3].usage << std::endl;
-	std::cout << "sdkmesh_vertex_header_buffers[1].Declaration[3] type:" << (int)sdkmesh_vertex_header_buffers[1].Decl[3].type << std::endl;
-	std::cout << "sdkmesh_vertex_header_buffers[1].Declaration[4] Method:" << (int)sdkmesh_vertex_header_buffers[1].Decl[4].method << std::endl;
-	std::cout << "sdkmesh_vertex_header_buffers[1].Declaration[4] usage:" << (int)sdkmesh_vertex_header_buffers[1].Decl[4].usage << std::endl;
-	std::cout << "sdkmesh_vertex_header_buffers[1].Declaration[4] type:" << (int)sdkmesh_vertex_header_buffers[1].Decl[4].type << std::endl;*/
 
 	// vertex elemet structure (input Squidroom): 
 	//    usage        type      method      size
@@ -240,27 +212,6 @@ void Sdkmesh::LoadSdkmeshVertexBuffer_9(std::ifstream& inputStream, std::streamp
 		}
 		vertex_buffers_9[i] = vertexBuffer;
 	}
-
-	// print to check
-	/*std::cout << vertex_buffers[0][0].pos.X << std::endl;
-	std::cout << vertex_buffers[0][0].pos.Y << std::endl;
-	std::cout << vertex_buffers[0][0].pos.Z << std::endl;
-	std::cout << vertex_buffers[0][0].norm.X << std::endl;
-	std::cout << vertex_buffers[0][0].norm.Y << std::endl;
-	std::cout << vertex_buffers[0][0].norm.Z << std::endl;
-	std::cout << vertex_buffers[0][0].tan.X << std::endl;
-	std::cout << vertex_buffers[0][0].tan.Y << std::endl;
-	std::cout << vertex_buffers[0][0].tan.Z << std::endl;
-	std::cout << std::endl;
-	std::cout << vertex_buffers[num_buffer - 1][sdkmesh_vertex_buffer_headers[num_buffer - 1].NumVertices - 1].pos.X << std::endl;
-	std::cout << vertex_buffers[num_buffer - 1][sdkmesh_vertex_buffer_headers[num_buffer - 1].NumVertices - 1].pos.Y << std::endl;
-	std::cout << vertex_buffers[num_buffer - 1][sdkmesh_vertex_buffer_headers[num_buffer - 1].NumVertices - 1].pos.Z << std::endl;
-	std::cout << vertex_buffers[num_buffer - 1][sdkmesh_vertex_buffer_headers[num_buffer - 1].NumVertices - 1].norm.X << std::endl;
-	std::cout << vertex_buffers[num_buffer - 1][sdkmesh_vertex_buffer_headers[num_buffer - 1].NumVertices - 1].norm.Y << std::endl;
-	std::cout << vertex_buffers[num_buffer - 1][sdkmesh_vertex_buffer_headers[num_buffer - 1].NumVertices - 1].norm.Z << std::endl;
-	std::cout << vertex_buffers[num_buffer - 1][sdkmesh_vertex_buffer_headers[num_buffer - 1].NumVertices - 1].tan.X << std::endl;
-	std::cout << vertex_buffers[num_buffer - 1][sdkmesh_vertex_buffer_headers[num_buffer - 1].NumVertices - 1].tan.Y << std::endl;
-	std::cout << vertex_buffers[num_buffer - 1][sdkmesh_vertex_buffer_headers[num_buffer - 1].NumVertices - 1].tan.Z << std::endl;*/
 }
 
 void Sdkmesh::LoadSdkmeshVertexBuffer(std::ifstream& inputStream, std::streampos fileSize)
@@ -315,27 +266,6 @@ void Sdkmesh::LoadSdkmeshVertexBuffer(std::ifstream& inputStream, std::streampos
 		}
 		vertex_buffers[i] = vertexBuffer;
 	}
-
-	// print to check
-	/*std::cout << vertex_buffers[0][0].pos.X << std::endl;
-	std::cout << vertex_buffers[0][0].pos.Y << std::endl;
-	std::cout << vertex_buffers[0][0].pos.Z << std::endl;
-	std::cout << vertex_buffers[0][0].norm.X << std::endl;
-	std::cout << vertex_buffers[0][0].norm.Y << std::endl;
-	std::cout << vertex_buffers[0][0].norm.Z << std::endl;
-	std::cout << vertex_buffers[0][0].tan.X << std::endl;
-	std::cout << vertex_buffers[0][0].tan.Y << std::endl;
-	std::cout << vertex_buffers[0][0].tan.Z << std::endl;
-	std::cout << std::endl;
-	std::cout << vertex_buffers[num_buffer - 1][sdkmesh_vertex_buffer_headers[num_buffer - 1].NumVertices - 1].pos.X << std::endl;
-	std::cout << vertex_buffers[num_buffer - 1][sdkmesh_vertex_buffer_headers[num_buffer - 1].NumVertices - 1].pos.Y << std::endl;
-	std::cout << vertex_buffers[num_buffer - 1][sdkmesh_vertex_buffer_headers[num_buffer - 1].NumVertices - 1].pos.Z << std::endl;
-	std::cout << vertex_buffers[num_buffer - 1][sdkmesh_vertex_buffer_headers[num_buffer - 1].NumVertices - 1].norm.X << std::endl;
-	std::cout << vertex_buffers[num_buffer - 1][sdkmesh_vertex_buffer_headers[num_buffer - 1].NumVertices - 1].norm.Y << std::endl;
-	std::cout << vertex_buffers[num_buffer - 1][sdkmesh_vertex_buffer_headers[num_buffer - 1].NumVertices - 1].norm.Z << std::endl;
-	std::cout << vertex_buffers[num_buffer - 1][sdkmesh_vertex_buffer_headers[num_buffer - 1].NumVertices - 1].tan.X << std::endl;
-	std::cout << vertex_buffers[num_buffer - 1][sdkmesh_vertex_buffer_headers[num_buffer - 1].NumVertices - 1].tan.Y << std::endl;
-	std::cout << vertex_buffers[num_buffer - 1][sdkmesh_vertex_buffer_headers[num_buffer - 1].NumVertices - 1].tan.Z << std::endl;*/
 }
 
 void Sdkmesh::LoadSdkmeshIndexBuffer(std::ifstream& inputStream, std::streampos fileSize)
