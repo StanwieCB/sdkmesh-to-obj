@@ -100,12 +100,6 @@ void Sdkmesh::LoadSdkemshIndexBufferHeader(std::ifstream& inputStream, std::stre
 	{
 		inputStream.read((char*)&(sdkmesh_index_buffer_headers[i]), sizeof(SdkmeshIndexBufferHeader));
 	}
-
-	// print to check
-	/*std::cout <<"sdkmesh_index_header_buffers[0].NumIndices:"<< sdkmesh_index_header_buffers[0].NumIndices << std::endl;
-	std::cout <<"sdkmesh_index_header_buffers[0].SizeBytes:"<< sdkmesh_index_header_buffers[0].SizeBytes << std::endl;
-	std::cout <<"sdkmesh_index_header_buffers[0].IndexType:"<< sdkmesh_index_header_buffers[0].IndexType << std::endl;
-	std::cout <<"sdkmesh_index_header_buffers[0].DataOffset:"<< sdkmesh_index_header_buffers[0].DataOffset << std::endl;*/
 }
 
 
@@ -122,6 +116,10 @@ void Sdkmesh::LoadSdkmeshMesh(std::ifstream& inputStream, std::streampos fileSiz
 	for (unsigned i = 0; i < num; i++)
 	{
 		inputStream.read((char*)&(sdkmesh_meshes[i]), sizeof(SdkmeshMesh));
+		if (sdkmesh_meshes[i].NumSubsets > 1)
+		{
+			std::cout << "mesh id: " << i << " subsets number: " << sdkmesh_meshes[i].NumSubsets << std::endl;
+		}
 	}
 }
 
@@ -174,12 +172,33 @@ void Sdkmesh::LoadSdkmeshMaterial(std::ifstream& inputStream, std::streampos fil
 	{
 		inputStream.read((char*)&(sdkmesh_materials[i]), sizeof(SdkmeshMaterial));
 	}
+}
 
-	// print to check
-	std::cout << sdkmesh_materials[num - 1].Name << std::endl;
-	std::cout << sdkmesh_materials[num - 1].MaterialInstancePath << std::endl;
-	std::cout << sdkmesh_materials[num - 1].DiffuseTexture << std::endl;
-	std::cout << sdkmesh_materials[num - 1].Force64_6 << std::endl;
+void Sdkmesh::LoadSdkmeshSubsetIndexBuffer(std::ifstream& inputStream, std::streampos fileSize)
+{
+	inputStream.seekg(sdkmesh_header.SubsetDataOffset, std::ios::beg);
+	std::streampos pos = inputStream.tellg();
+	if (fileSize - pos < sizeof(sdkmesh_header.NumTotalSubsets * sizeof(int)))
+		throw std::exception("EOF before reading Sdkmesh_SdkmeshSubsetIndexBuffer");
+
+	subset_index_buffers.resize(sdkmesh_header.NumMeshes);
+
+	unsigned cnt = 0;
+	unsigned total = 0;
+	for (auto mesh : sdkmesh_meshes)
+	{
+		subset_index_buffers[cnt].resize(mesh.NumSubsets);
+		inputStream.seekg(mesh.SubsetOffset, std::ios::beg);
+		for (unsigned i = 0; i < mesh.NumSubsets; i++)
+		{
+			inputStream.read((char*)&(subset_index_buffers[cnt][i]), sizeof(int));
+			total += 1;
+		}
+		cnt += 1;
+	}
+
+	if (total != sdkmesh_header.NumTotalSubsets)
+		throw std::exception("Subsets number error");
 }
 
 // for D3D9 with Dec3N and HalfTwo exlucsively
@@ -327,6 +346,7 @@ Sdkmesh::Sdkmesh(std::ifstream& inputStream, std::streampos fileSize)
 	LoadSdkmeshSubset(inputStream, fileSize);
 	LoadSdkmeshFrame(inputStream, fileSize);
 	LoadSdkmeshMaterial(inputStream, fileSize);
+	LoadSdkmeshSubsetIndexBuffer(inputStream, fileSize);
 
 	LoadSdkmeshVertexBuffer(inputStream, fileSize);
 	LoadSdkmeshIndexBuffer(inputStream, fileSize);
@@ -341,6 +361,7 @@ void Sdkmesh::CreateFromFile(std::ifstream& inputStream, std::streampos fileSize
 	LoadSdkmeshSubset(inputStream, fileSize);
 	LoadSdkmeshFrame(inputStream, fileSize);
 	LoadSdkmeshMaterial(inputStream, fileSize);
+	LoadSdkmeshSubsetIndexBuffer(inputStream, fileSize);
 
 	LoadSdkmeshVertexBuffer(inputStream, fileSize);
 	LoadSdkmeshIndexBuffer(inputStream, fileSize);
@@ -355,6 +376,7 @@ void Sdkmesh::CreateFromFile_9(std::ifstream& inputStream, std::streampos fileSi
 	LoadSdkmeshSubset(inputStream, fileSize);
 	LoadSdkmeshFrame(inputStream, fileSize);
 	LoadSdkmeshMaterial(inputStream, fileSize);
+	LoadSdkmeshSubsetIndexBuffer(inputStream, fileSize);
 
 	LoadSdkmeshVertexBuffer_9(inputStream, fileSize);
 	LoadSdkmeshIndexBuffer(inputStream, fileSize);

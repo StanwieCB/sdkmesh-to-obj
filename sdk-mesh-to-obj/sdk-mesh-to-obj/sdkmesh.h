@@ -159,6 +159,7 @@ private:
 	std::vector<SdkmeshFrame> sdkmesh_frames;
 	std::vector<SdkmeshMaterial> sdkmesh_materials;
 
+	std::vector<std::vector<int>> subset_index_buffers;
 	std::vector<std::vector<PosNormalTexTan_9>> vertex_buffers_9;
 	std::vector<std::vector<PosNormalTexTan>> vertex_buffers;
 	std::vector<std::vector<int>> index_buffers;
@@ -171,6 +172,7 @@ private:
 	void LoadSdkmeshSubset(std::ifstream& inputStream, std::streampos fileSize);
 	void LoadSdkmeshFrame(std::ifstream& inputStream, std::streampos fileSize);
 	void LoadSdkmeshMaterial(std::ifstream& inputStream, std::streampos fileSize);
+	void LoadSdkmeshSubsetIndexBuffer(std::ifstream& inputStream, std::streampos fileSize);
 
 	void LoadSdkmeshVertexBuffer(std::ifstream& inputStream, std::streampos fileSize);
 	void LoadSdkmeshVertexBuffer_9(std::ifstream& inputStream, std::streampos fileSize);
@@ -194,6 +196,7 @@ public:
 	const std::vector<SdkmeshSubset>& GetSdkmeshSubset() { return sdkmesh_subsets; }
 	const std::vector<SdkmeshFrame>& GetSdkmeshFrame() { return sdkmesh_frames; }
 	const std::vector<SdkmeshMaterial>& GetSdkmeshMaterial() { return sdkmesh_materials; }
+	const std::vector<std::vector<int>>& GetSdkmeshSubsetIndexBuffer() { return subset_index_buffers; }
 	const std::vector<std::vector<PosNormalTexTan_9>>& GetSdkmeshVertexBuffer_9() { return vertex_buffers_9; }
 	const std::vector<std::vector<PosNormalTexTan>>& GetSdkmeshVertexBuffer() { return vertex_buffers; }
 	const std::vector<std::vector<int>>& GetSdkmeshIndexBuffer() { return index_buffers; }
