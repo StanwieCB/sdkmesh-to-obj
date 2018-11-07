@@ -116,10 +116,10 @@ void Sdkmesh::LoadSdkmeshMesh(std::ifstream& inputStream, std::streampos fileSiz
 	for (unsigned i = 0; i < num; i++)
 	{
 		inputStream.read((char*)&(sdkmesh_meshes[i]), sizeof(SdkmeshMesh));
-		if (sdkmesh_meshes[i].NumSubsets > 1)
-		{
-			std::cout << "mesh id: " << i << " subsets number: " << sdkmesh_meshes[i].NumSubsets << std::endl;
-		}
+		//if (sdkmesh_meshes[i].NumSubsets > 1)
+		//{
+		//	std::cout << "mesh id: " << i << " subsets number: " << sdkmesh_meshes[i].NumSubsets << std::endl;
+		//}
 	}
 }
 

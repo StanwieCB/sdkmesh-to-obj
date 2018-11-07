@@ -261,6 +261,24 @@ int WriteMTL(Sdkmesh& sdkmesh, std::ofstream& output)
 	}
 }
 
+int WriteMeshMat(Sdkmesh& sdkmesh, std::ofstream& output)
+{
+	/// write mesh - material if sdkmesh has material definition
+	// test number
+	if (sdkmesh.GetSdkmeshHeader().NumMaterials < 1)
+		return 0;
+
+	output << "Mesh name\tMat name\n\n";
+	for (int i = 0; i < sdkmesh.GetSdkmeshHeader().NumMeshes; i++)
+	{
+		for (auto ind : sdkmesh.GetSdkmeshSubsetIndexBuffer()[i])
+		{
+			output << "mesh_" << i << "_" << sdkmesh.GetSdkmeshMesh()[i].Name << "\t"<<sdkmesh.GetSdkmeshMaterial()[sdkmesh.GetSdkmeshSubset()[ind].MaterialID].Name<<"\n";
+		}
+	}
+	return 0;
+}
+
 int Convert(const std::string& inputFile, const std::string& outputFile)
 {
 	std::ifstream input(inputFile, std::ios::binary | std::ios::in);
@@ -276,7 +294,8 @@ int Convert(const std::string& inputFile, const std::string& outputFile)
 		return -1;
 	}
 	std::ofstream output_obj(outputFile, std::ios::out | std::ios::binary);
-	std::ofstream output_mtl(outputFile.substr(0, outputFile.size() - 4)+".mtl", std::ios::out | std::ios::binary);
+	std::ofstream output_mtl(outputFile.substr(0, outputFile.size() - 4) + ".mtl", std::ios::out | std::ios::binary);
+	std::ofstream output_mesh_mtl(outputFile.substr(0, outputFile.size() - 4) + "_mesh_mat.txt", std::ios::out);
 
 	// traverse to count size
 	// a bit silly but an accurate way
@@ -299,6 +318,7 @@ int Convert(const std::string& inputFile, const std::string& outputFile)
 		input.close();
 		output_obj.close();
 		output_mtl.close();
+		output_mesh_mtl.close();
 		return -1;
 	}
 
@@ -308,12 +328,24 @@ int Convert(const std::string& inputFile, const std::string& outputFile)
 		input.close();
 		output_obj.close();
 		output_mtl.close();
+		output_mesh_mtl.close();
+		return -1;
+	}
+
+	if (WriteMeshMat(sdkmeshInstane, output_mesh_mtl) == -1)
+	{
+		std::cout << "Dump into _mesh_mat.txt failed" << std::endl;
+		input.close();
+		output_obj.close();
+		output_mtl.close();
+		output_mesh_mtl.close();
 		return -1;
 	}
 
 	input.close();
 	output_obj.close(); 
 	output_mtl.close();
+	output_mesh_mtl.close();
 	return 0;
 }
 
