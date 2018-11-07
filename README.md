@@ -53,7 +53,6 @@ example:
 ## Limitations
 
 - Limited implementation for vertex structure
-- currently no support for subset
 - currently no support for animation
 
 Yiheng Zhang
