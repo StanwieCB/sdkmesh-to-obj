@@ -158,24 +158,24 @@ int WriteOBJ_9(Sdkmesh& sdkmesh, std::ofstream& output)
 			output << "v " << vertex.pos.X << " " << vertex.pos.Y << " " << vertex.pos.Z << "\n";
 		output << "\n";
 
-		for (auto vertex : vb)
-		{
-			// value
-			float X, Y, Z;
-			X = (float)((vertex.norm.total & Dec3NMaskX) >> 22);
-			Y = (float)((vertex.norm.total & Dec3NMaskY) >> 12);
-			Z = (float)((vertex.norm.total & Dec3NMaskZ) >> 2);
-			// sign bit
-			if ((vertex.norm.total & Dec3NMaskXS) >> 31)
-				X = -X;
-			if ((vertex.norm.total & Dec3NMaskYS) >> 21)
-				Y = -Y;
-			if ((vertex.norm.total & Dec3NMaskZS) >> 11)
-				Z = -Z;
-			// normalize [-511.0, 511.0]
-			output<< "vn " << (X / 511.0) << " " << (Y / 511.0) << " " << (Z / 511.0) << "\n";
-		}
-		output << "\n";
+		//for (auto vertex : vb)
+		//{
+		//	// value
+		//	float X, Y, Z;
+		//	X = (float)((vertex.norm.total & Dec3NMaskX) >> 22);
+		//	Y = (float)((vertex.norm.total & Dec3NMaskY) >> 12);
+		//	Z = (float)((vertex.norm.total & Dec3NMaskZ) >> 2);
+		//	// sign bit
+		//	if ((vertex.norm.total & Dec3NMaskXS) >> 31)
+		//		X = -X;
+		//	if ((vertex.norm.total & Dec3NMaskYS) >> 21)
+		//		Y = -Y;
+		//	if ((vertex.norm.total & Dec3NMaskZS) >> 11)
+		//		Z = -Z;
+		//	// normalize [-511.0, 511.0]
+		//	output<< "vn " << (X / 511.0) << " " << (Y / 511.0) << " " << (Z / 511.0) << "\n";
+		//}
+		//output << "\n";
 
 		for (auto vertex : vb)
 			output << "vt " << (float)vertex.tex.X << " " << (float)vertex.tex.Y << "\n";
