@@ -99,6 +99,7 @@ int WriteOBJ(Sdkmesh& sdkmesh, std::ofstream& output)
 		// triangle mesh
 		std::vector<int> ib = indexBuffers[mesh.IndexBuffer];
 		output << "g mesh_" << cnt << "_" << mesh.Name << "\n";
+		output << "usemtl " << sdkmesh.GetSdkmeshMaterial()[sdkmesh.GetSdkmeshSubset()[mesh.IndexBuffer].MaterialID].Name << "\n";
 
 		int numTriangles = ib.size() / 3;
 		for (int i = 0; i < numTriangles; i++)
@@ -188,6 +189,7 @@ int WriteOBJ_9(Sdkmesh& sdkmesh, std::ofstream& output)
 		// triangle mesh
 		std::vector<int> ib = indexBuffers[mesh.IndexBuffer];
 		output << "g mesh_" << cnt << "_" << mesh.Name << "\n";
+		output << "usemtl " << sdkmesh.GetSdkmeshMaterial()[sdkmesh.GetSdkmeshSubset()[mesh.IndexBuffer].MaterialID].Name << "\n";
 
 		int numTriangles = ib.size() / 3;
 		for (int i = 0; i < numTriangles; i++)
