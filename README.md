@@ -1,5 +1,5 @@
 # sdkmesh-to-obj
-An open source sdkmesh to obj converter supports multiple meshes conversion and in Intel VCE group
+An open source sdkmesh to obj converter supports multiple meshes conversion made in Intel VCE group
 
 Visual Studio version: Vision Studio 2015 Update3
 
